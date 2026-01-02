@@ -17,28 +17,63 @@ import {
     responsiveWidth,
     responsiveHeight,
 } from "react-native-responsive-dimensions";
-import GoogleAndFacebookButtonList from "../Buttons/CustomSocialButton";
-import HeaderTextBlock from "../CommonHelper/HeaderTextBlock";
+import GoogleAndFacebookButtonList from "../../Buttons/CustomSocialButton";
+import HeaderTextBlock from "../../CommonHelper/HeaderTextBlock";
+import { useDispatch, useSelector } from "react-redux";
+import { verifyOtp } from '../../store/slices/authSlice';
 
-const SignUpScreen = ({ navigation }) => {
-    const [ShowPassword, setShowPassword] = useState(false);
+const SignUpScreen = ({ navigation, route }) => {
+    const dispatch = useDispatch();
+    const { email: initialEmail } = route.params || {};
+    const { isLoading, receivedOtp } = useSelector(state => state.auth);
+
+    const [showPassword, setShowPassword] = useState(false);
     const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [email, setEmail] = useState(initialEmail || "");
     const [password, setPassword] = useState("");
+    const [otpCode, setOtpCode] = useState("");
 
-    const handleSignUp = () => {
-        if (!name || !email || !password) {
+    React.useEffect(() => {
+        if (receivedOtp) {
+            setOtpCode(receivedOtp.toString());
+        }
+    }, [receivedOtp]);
+
+    const handleSignUp = async () => {
+        data = {
+            name1: name,
+            email1: email,
+            password1: password,
+            otpCode1: otpCode,
+            phoneNumber1: phoneNumber
+        }
+        console.log(data)
+
+        if (!name || !email || !password || !otpCode || !phoneNumber) {
             alert("Please fill all fields");
             return;
         }
-        // Proceed to sign up logic
-        navigation.navigate("SignInScreen");
+
+        const userData = { name, email, password, phone_no: phoneNumber, confirmpassword: password };
+        const resultAction = await dispatch(verifyOtp({
+            ...userData,
+            otp: otpCode
+        }));
+
+        if (verifyOtp.fulfilled.match(resultAction)) {
+            // Navigation to 'Main' is handled automatically by MainNavigation when token is set
+
+        } else {
+            const errorMessage = resultAction.payload?.message || "Verification failed";
+            alert(errorMessage);
+        }
     };
 
     return (
         <View style={styles.container}>
             <ImageBackground
-                source={require("../assets/images/SignUpScreen.png")}
+                source={require("../../assets/images/SignUpScreen.png")}
                 style={styles.bgImage}
                 resizeMode="cover"
             />
@@ -56,10 +91,10 @@ const SignUpScreen = ({ navigation }) => {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 20 }}>
                         <TouchableOpacity
                             style={styles.skipButton}
-                            onPress={() => navigation.replace("SignInScreen")}
+                            onPress={() => navigation.replace("EmailVerificationScreen")}
                         >
                             <Image
-                                source={require('../assets/icons/Back.png')}
+                                source={require('../../assets/icons/Back.png')}
                                 style={styles.ArrowStyle}
                             />
                         </TouchableOpacity>
@@ -70,7 +105,7 @@ const SignUpScreen = ({ navigation }) => {
                         >
                             <Text style={styles.skipText}>Skip{" "}</Text>
                             <Image
-                                source={require('../assets/icons/Forward.png')}
+                                source={require('../../assets/icons/Forward.png')}
                                 style={styles.ArrowStyle}
                             />
                         </TouchableOpacity>
@@ -81,20 +116,20 @@ const SignUpScreen = ({ navigation }) => {
                         title="Digi"
                         boldPart="FASHION"
                         subtitle={'Create Account'}
-                        containerStyle={{ marginLeft: responsiveWidth(9) }}
+                        containerStyle={{ marginLeft: responsiveWidth(9), marginTop: responsiveHeight(15) }}
                         subtitleStyle={{ fontSize: RFValue(26), fontWeight: '700' }}
                     />
 
                     {/* Input Fields */}
                     <View style={styles.formInputFields}>
-                        {/* Email Field */}
+                        {/* Full Name Field */}
                         <View style={styles.inputWrapper}>
                             <Image
-                                source={require("../assets/icons/User.png")}
+                                source={require("../../assets/icons/User.png")}
                                 style={styles.inputIcon}
                             />
                             <TextInput
-                                placeholder="Name"
+                                placeholder="Full Name"
                                 placeholderTextColor="rgba(255,255,255,0.7)"
                                 style={styles.SignInInputFields}
                                 keyboardType="default"
@@ -102,9 +137,10 @@ const SignUpScreen = ({ navigation }) => {
                                 onChangeText={setName}
                             />
                         </View>
+                        {/* Email Field */}
                         <View style={styles.inputWrapper}>
                             <Image
-                                source={require("../assets/icons/Email.png")}
+                                source={require("../../assets/icons/Email.png")}
                                 style={styles.inputIcon}
                             />
                             <TextInput
@@ -117,35 +153,65 @@ const SignUpScreen = ({ navigation }) => {
                                 onChangeText={setEmail}
                             />
                         </View>
+                        {/* PhoneNumber Field */}
+                        <View style={styles.inputWrapper}>
+                            <Image
+                                source={require("../../assets/icons/User.png")}
+                                style={styles.inputIcon}
+                            />
+                            <TextInput
+                                placeholder="Phone Number"
+                                placeholderTextColor="rgba(255,255,255,0.7)"
+                                style={styles.SignInInputFields}
+                                keyboardType="phone-pad"
+                                value={phoneNumber}
+                                onChangeText={setPhoneNumber}
+                            />
+                        </View>
 
                         {/* Password Field */}
                         <View style={styles.inputWrapper}>
                             <Image
-                                source={require("../assets/icons/PasswordLock.png")}
+                                source={require("../../assets/icons/PasswordLock.png")}
                                 style={styles.inputIcon}
                             />
                             <TextInput
                                 placeholder="Password"
                                 placeholderTextColor="rgba(255,255,255,0.7)"
                                 style={styles.SignInInputFields}
-                                secureTextEntry={!ShowPassword}
+                                secureTextEntry={!showPassword}
                                 value={password}
                                 onChangeText={setPassword}
                             />
                             <TouchableOpacity
-                                onPress={() => setShowPassword(!ShowPassword)}
+                                onPress={() => setShowPassword(!showPassword)}
                             >
                                 <View style={styles.EyeIconSpace}>
                                     <Image
                                         source={
-                                            ShowPassword
-                                                ? require("../assets/icons/Show.png")
-                                                : require("../assets/icons/Hide.png")
+                                            showPassword
+                                                ? require("../../assets/icons/Show.png")
+                                                : require("../../assets/icons/Hide.png")
                                         }
                                         style={styles.passwordicon}
                                     />
                                 </View>
                             </TouchableOpacity>
+                        </View>
+                        {/* OTP Field */}
+                        <View style={styles.inputWrapper}>
+                            <Image
+                                source={require("../../assets/icons/User.png")}
+                                style={styles.inputIcon}
+                            />
+                            <TextInput
+                                placeholder="OTP"
+                                placeholderTextColor="rgba(255,255,255,0.7)"
+                                style={styles.SignInInputFields}
+                                keyboardType="number-pad"
+                                value={otpCode}
+                                onChangeText={setOtpCode}
+                            />
                         </View>
                     </View>
 
@@ -157,7 +223,7 @@ const SignUpScreen = ({ navigation }) => {
                             backgroundColor="white"
                             title="Sign Up"
                             textColor="#000"
-                            icon={require('../assets/icons/email1.png')}
+                            icon={require('../../assets/icons/email1.png')}
                             onPress={handleSignUp}
                             style={styles.googleBtn}
                         />
@@ -167,22 +233,22 @@ const SignUpScreen = ({ navigation }) => {
                             backgroundColor="white"
                             title="Log in with Google"
                             textColor="#000"
-                            icon={require('../assets/icons/google.png')}
+                            icon={require('../../assets/icons/google.png')}
                             onPress={() => console.log("Google Sign In")}
                             style={styles.googleBtn} // keeps your variable name exactly same
                         />
 
-                        <GoogleAndFacebookButtonList
+                        {/* <GoogleAndFacebookButtonList
                             width={responsiveWidth(80)}
                             height={responsiveHeight(6.5)}
                             backgroundColor="#4267B2"
                             title="Log in With Facebook"
                             textColor="white"
-                            icon={require('../assets/icons/facebook.png')}
+                            icon={require('../../assets/icons/facebook.png')}
                             onPress={() => console.log("Facebook Sign In")}
                             style={styles.facebookBtn} // keeps your variable name EXACTLY same
-                        />
-                        <View style={{ flexDirection: 'row', marginTop: responsiveHeight(5) }}>
+                        /> */}
+                        <View style={{ flexDirection: 'row' }}>
                             <Text style={styles.linkText}>
                                 Already a account?{" "}
                             </Text>
@@ -217,7 +283,8 @@ const styles = StyleSheet.create({
 
     ArrowStyle: {
         height: responsiveHeight(2),
-        width: responsiveWidth(3)
+        width: responsiveWidth(3),
+        tintColor: 'white'
     },
 
     bgImage: {

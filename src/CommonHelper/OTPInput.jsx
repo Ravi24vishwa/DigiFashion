@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { View, TextInput, StyleSheet } from "react-native";
 
-const OtpInput = ({ length = 4, onChangeOTP }) => {
+const OtpInput = ({ length = 6, onChangeOTP }) => {
   const inputRefs = useRef([]);
   const [otp, setOtp] = useState(Array(length).fill(""));
 
@@ -25,7 +25,7 @@ const OtpInput = ({ length = 4, onChangeOTP }) => {
     }
 
     onChangeOTP && onChangeOTP(newOtp.join(""));
-    
+
   };
 
   const handleBackspace = (key, index) => {
@@ -48,7 +48,7 @@ const OtpInput = ({ length = 4, onChangeOTP }) => {
           onChangeText={(text) => handleChange(text, index)}
           onKeyPress={({ nativeEvent: { key } }) => handleBackspace(key, index)}
           caretHidden={true}
-          // selectionColor={'#000'}
+        // selectionColor={'#000'}
         />
       ))}
     </View>
@@ -61,17 +61,17 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "85%",
+    width: "95%",
     alignSelf: "center",
     marginVertical: 20,
     // gap: 18,
     // backgroundColor: 'red'
   },
   input: {
-    width: 65,
-    height: 65,
+    width: 55,
+    height: 55,
     textAlign: "center",
-    fontSize: 42,
+    fontSize: 32,
     fontWeight: "600",
     borderColor: "#000",
     borderRadius: 50,

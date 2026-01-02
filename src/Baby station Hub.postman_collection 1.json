@@ -1,0 +1,1234 @@
+{
+	"info": {
+		"_postman_id": "5c29351c-7543-4ab9-8de0-fb400e0c4530",
+		"name": "Baby station Hub",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6278423",
+		"_collection_link": "https://magento-odoo-sync.postman.co/workspace/My-Workspace~eaddfb86-6eb2-4dac-8954-86592b74e083/collection/6278423-5c29351c-7543-4ab9-8de0-fb400e0c4530?action=share&source=collection_link&creator=6278423"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "SendOtp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "test@gmail.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{online_url}}sendOtp",
+							"host": [
+								"{{online_url}}sendOtp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "22|evbxxIf3t0TL3HRurwzBkX4PhuM6paVOA7tMnKZJ6b368a0a",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{online_url}}logout",
+							"host": [
+								"{{online_url}}logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id",
+									"value": "4",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "Test",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "test@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "phone_no",
+									"value": "1234567890",
+									"type": "text"
+								},
+								{
+									"key": "otp",
+									"value": "547006",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								},
+								{
+									"key": "confirmpassword",
+									"value": "123456",
+									"type": "text"
+								},
+								{
+									"key": "dob",
+									"value": "1995-06-15",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{online_url}}verifyOtp",
+							"host": [
+								"{{online_url}}verifyOtp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"test@gmail.com\",\r\n  \"password\": \"Pass@123\",\r\n  \"remember_me\": false,\r\n  \"device_id\" : \"BE2A.250530.026.D1xx\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}login",
+							"host": [
+								"{{online_url}}login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forgot-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"team.sridix@gmail.com\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}forgot-password",
+							"host": [
+								"{{online_url}}forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Google Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"test@gmail.com\",\r\n  \"password\": \"Pass@123\",\r\n  \"remember_me\": false,\r\n  \"device_id\" : \"BE2A.250530.026.D1xx\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{online_url}}google-login",
+							"host": [
+								"{{online_url}}google-login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Slider",
+			"item": [
+				{
+					"name": "Slider",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "186|QoSbYC79FJKT4EO2mcgqrcazWa3pd2tzofRj4t9n5d75380a",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{online_url}}sliders",
+							"host": [
+								"{{online_url}}sliders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Banner",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{online_url}}banners",
+							"host": [
+								"{{online_url}}banners"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Home",
+			"item": [
+				{
+					"name": "Homedata",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{offline_url}}homedata?store_id=8",
+							"host": [
+								"{{offline_url}}homedata"
+							],
+							"query": [
+								{
+									"key": "store_id",
+									"value": "8"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Brand",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{online_url}}brands",
+							"host": [
+								"{{online_url}}brands"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Category",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"device_id\" : \"UP1A.231005.007\",\r\n    \"per_page\" :20,\r\n    \"isParent\":\"0\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}categories",
+							"host": [
+								"{{online_url}}categories"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{online_url}}cart/listing",
+							"host": [
+								"{{online_url}}cart"
+							],
+							"path": [
+								"listing"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cart_item_id\" : 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}cart/delete",
+							"host": [
+								"{{online_url}}cart"
+							],
+							"path": [
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"product_id\" : 6552,\r\n    \"shop_id\":1,\r\n    \"qty\" :2,\r\n    \"device_id\" : \"BE2A.250530.026.D1xx\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}cart/add",
+							"host": [
+								"{{online_url}}cart"
+							],
+							"path": [
+								"add"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product Management",
+			"item": [
+				{
+					"name": "Order",
+					"item": [
+						{
+							"name": "Review",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "41|SRvVfKUSzLumS9O9vQ7sFqAlfJevTuzaPJB88ucPfda9f489",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"slug\": \"aberlour-10-year-old-forest-reserve\",\r\n  \"limit\" : 3,\r\n  \"rating\" : 5\r\n}\r\n\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{online_url}}order/review/list",
+											"host": [
+												"{{online_url}}order"
+											],
+											"path": [
+												"review",
+												"list"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "30|dmmOl4AFmopXR5k4aa2hYNnXXQxO7Lb2KUrJDvn0c0aa6ed9",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"product_id\" : 31,\r\n    \"rating\": 5,\r\n    \"review\": \"Superb performance and great build quality!\"\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{online_url}}order/review/add",
+											"host": [
+												"{{online_url}}order"
+											],
+											"path": [
+												"review",
+												"add"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "List",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "186|QoSbYC79FJKT4EO2mcgqrcazWa3pd2tzofRj4t9n5d75380a",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{online_url}}order/list",
+									"host": [
+										"{{online_url}}order"
+									],
+									"path": [
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Details",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "186|QoSbYC79FJKT4EO2mcgqrcazWa3pd2tzofRj4t9n5d75380a",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"order_id\": 3\r\n}\r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{online_url}}order/details",
+									"host": [
+										"{{online_url}}order"
+									],
+									"path": [
+										"details"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "submit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "186|QoSbYC79FJKT4EO2mcgqrcazWa3pd2tzofRj4t9n5d75380a",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    // \"billing_address\": 3,\r\n    // \"payment\": \"pickupstore\", \r\n    \"delivery_type\":\"store_pickup\", //store_pickup or delivery\r\n    \"store_id\": 2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{online_url}}order/submit",
+									"host": [
+										"{{online_url}}order"
+									],
+									"path": [
+										"submit"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "96|vducAR9kzR4lw1Im2yYhobq50NgvSfsBe2rLUOzG1f12439c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"slug\":\"zing-zang-margdaiq-mix-750ml-43335\",\r\n    \"shop_id\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}product/",
+							"host": [
+								"{{online_url}}product"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Shop",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"per_page\": 100,\r\n    \"page\": 1,\r\n    // \"search\": \"\",\r\n    // \"category_ids\": [2],\r\n    // \"sort_by\": \"z_to_a\",  //newest, high_to_low, low_to_high, a_to_z, z_to_a\r\n    // \"price_range\": \"0-15\", \r\n    // \"brand\": \"b1 1\"\r\n    \"store_id\" : 1\r\n    // \"device_id\" : \"UP1A.231005.007\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}shop",
+							"host": [
+								"{{online_url}}shop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter Listing",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{online_url}}filter-listing",
+							"host": [
+								"{{online_url}}filter-listing"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "favorite",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"product_id\": 26\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}favorite",
+							"host": [
+								"{{online_url}}favorite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "favorite list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "30|dmmOl4AFmopXR5k4aa2hYNnXXQxO7Lb2KUrJDvn0c0aa6ed9",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{online_url}}favorite/list",
+							"host": [
+								"{{online_url}}favorite"
+							],
+							"path": [
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Product search",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "41|SRvVfKUSzLumS9O9vQ7sFqAlfJevTuzaPJB88ucPfda9f489",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"search\": \"p\",\r\n    \"store_id\" : 69\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}product/serach",
+							"host": [
+								"{{online_url}}product"
+							],
+							"path": [
+								"serach"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Other",
+			"item": [
+				{
+					"name": "Contact_us",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"contact\" : \"12345678901\", // can store contact / email\r\n    \"message\": \"I want to know more about your services.\",\r\n    \"shop_id\":10\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}contact_us",
+							"host": [
+								"{{online_url}}contact_us"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "panel-setting",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}panel-setting",
+							"host": [
+								"{{online_url}}panel-setting"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pages",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{online_url}}pages",
+							"host": [
+								"{{online_url}}pages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Faq",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{online_url}}faqs",
+							"host": [
+								"{{online_url}}faqs"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Checkout",
+			"item": [
+				{
+					"name": "Coupon",
+					"item": [
+						{
+							"name": "coupon-list",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{online_url}}coupon/list",
+									"host": [
+										"{{online_url}}coupon"
+									],
+									"path": [
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "coupon-discount",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"coupon_id\" : 1,\r\n    \"is_remove\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{online_url}}coupon-discount",
+									"host": [
+										"{{online_url}}coupon-discount"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "checkout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"shop_id\":1,\r\n    \"delivery_type\":\"store_pickup\" //store_pickup or delivery  \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}checkout",
+							"host": [
+								"{{online_url}}checkout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "checkout-address-list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "14|EwJfHXdAUwGiv3qTR6pKKXLlIEaUxO62y86HPaV54a169580",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{online_url}}checkout/address/list",
+							"host": [
+								"{{online_url}}checkout"
+							],
+							"path": [
+								"address",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "checkout-address-add",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": 3,\r\n  \"address_type\" : \"home1\",\r\n  \"address\": \"xx1 123 MG Road\",\r\n  \"apt\": \"Near Central Mall\",\r\n  \"city\": \"Bangalore\",\r\n  \"state\": 1,\r\n  \"zipcode\": \"560001\",\r\n//   \"recipient_name\": \"John Doe\",\r\n  \"default\": 1,\r\n  \"title\" : \"xyz\"\r\n//   \"phone_no\": \"9876543210\"\r\n//   \"landmark\": \"Opposite Metro Station\"\r\n}\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}checkout/address/add",
+							"host": [
+								"{{online_url}}checkout"
+							],
+							"path": [
+								"address",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "checkout-address-state",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "10|b0v17fTvjqG8wmJgoMBrRIDilOOZhYxVL7tRjJHYfcfffef6",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{online_url}}checkout/address/state",
+							"host": [
+								"{{online_url}}checkout"
+							],
+							"path": [
+								"address",
+								"state"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "checkout-address-apply",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "14|EwJfHXdAUwGiv3qTR6pKKXLlIEaUxO62y86HPaV54a169580",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_address_id\": 6,\r\n    \"is_remove\":true //false\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{online_url}}checkout/address/apply",
+							"host": [
+								"{{online_url}}checkout"
+							],
+							"path": [
+								"address",
+								"apply"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "offline_url",
+			"value": "http://192.168.0.108:2205/api/"
+		},
+		{
+			"key": "online_url",
+			"value": "http://192.168.0.108:2205/api/",
+			"disabled": true
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "online_url",
+			"value": "https://ike.sevenoceansholiday.com/"
+		}
+	]
+}

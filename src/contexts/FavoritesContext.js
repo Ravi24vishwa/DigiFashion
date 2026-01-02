@@ -1,46 +1,76 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useMemo, useCallback } from 'react';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import {
+    toggleFavoriteAsync as rtToggleFavorite,
+    fetchFavorites as rtFetchFavorites,
+    clearFavorites as rtClearFavorites,
+    setFavorites as rtSetFavorites,
+} from '../store/slices/favoritesSlice';
 
 const FavoritesContext = createContext();
 
 export const FavoritesProvider = ({ children }) => {
-    const [favorites, setFavorites] = useState(new Set());
+    const dispatch = useDispatch();
+    const { favoriteIds, isLoading, error } = useSelector((state) => state.favorites, shallowEqual) || {};
 
-    const toggleFavorite = (itemOrId) => {
-        const productId = itemOrId?.id !== undefined ? itemOrId.id : itemOrId;
+    const isPrimitiveId = (v) => (typeof v === 'string' || typeof v === 'number');
 
-        setFavorites((prevFavorites) => {
-            const newFavorites = new Set(prevFavorites);
-            if (newFavorites.has(productId)) {
-                newFavorites.delete(productId);
-            } else {
-                newFavorites.add(productId);
-            }
-            return newFavorites;
-        });
-    };
+    const toggleFavorite = useCallback((itemOrId) => {
+        const id = itemOrId?.id !== undefined ? itemOrId.id : itemOrId;
+        if (!isPrimitiveId(id)) {
+            console.warn('FavoritesContext: toggleFavorite received non-primitive id, ignoring', id);
+            return;
+        }
+        dispatch(rtToggleFavorite(id));
+    }, [dispatch]);
 
-    const isFavorite = (productId) => {
-        return favorites.has(productId);
-    };
+    const addFavorite = useCallback((itemOrId) => {
+        const id = itemOrId?.id !== undefined ? itemOrId.id : itemOrId;
+        if (!isPrimitiveId(id)) return;
+        if (!favoriteIds.includes(id)) {
+            dispatch(rtToggleFavorite(id));
+        }
+    }, [dispatch, favoriteIds]);
 
-    const getFavorites = () => {
-        return Array.from(favorites);
-    };
+    const removeFavorite = useCallback((itemOrId) => {
+        const id = itemOrId?.id !== undefined ? itemOrId.id : itemOrId;
+        if (!isPrimitiveId(id)) return;
+        if (favoriteIds.includes(id)) {
+            dispatch(rtToggleFavorite(id));
+        }
+    }, [dispatch, favoriteIds]);
 
-    const clearFavorites = () => {
-        setFavorites(new Set());
-    };
+    const clearFavorites = useCallback(() => {
+        dispatch(rtClearFavorites());
+    }, [dispatch]);
+
+    const isFavorite = useCallback((productId) => {
+        return !!(favoriteIds && favoriteIds.includes(productId));
+    }, [favoriteIds]);
+
+    const getFavorites = useCallback(() => {
+        return favoriteIds ? favoriteIds : [];
+    }, [favoriteIds]);
+
+    const refreshFavorites = useCallback(() => {
+        dispatch(rtFetchFavorites());
+    }, [dispatch]);
+
+    const value = useMemo(() => ({
+        favoriteIds,
+        isLoading,
+        error,
+        toggleFavorite,
+        addFavorite,
+        removeFavorite,
+        clearFavorites,
+        isFavorite,
+        getFavorites,
+        refreshFavorites,
+    }), [favoriteIds, isLoading, error, toggleFavorite, addFavorite, removeFavorite, clearFavorites, isFavorite, getFavorites, refreshFavorites]);
 
     return (
-        <FavoritesContext.Provider
-            value={{
-                favorites,
-                toggleFavorite,
-                isFavorite,
-                getFavorites,
-                clearFavorites,
-            }}
-        >
+        <FavoritesContext.Provider value={value}>
             {children}
         </FavoritesContext.Provider>
     );

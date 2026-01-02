@@ -16,6 +16,30 @@ import { useTabBarVisibility } from '../contexts/TabBarVisibilityContext';
 
 const Tab = createBottomTabNavigator();
 
+// Reusable Tab Icon Component
+const TabIcon = React.memo(({ focused, activeIcon, inactiveIcon, label, iconStyle }) => (
+  <View style={styles.tabItem}>
+    {focused && <View style={styles.activeIndicator} />}
+    <View style={[
+      styles.iconContainer,
+      { backgroundColor: focused ? '#5B6BEE' : 'transparent' }
+    ]}>
+      <Image
+        source={focused ? activeIcon : inactiveIcon}
+        style={[styles.icon, iconStyle]}
+      />
+    </View>
+    {focused && (
+      <Text style={[
+        styles.label,
+        { color: '#5B6BEE' } // Simplified color since it only renders when focused
+      ]}>
+        {label}
+      </Text>
+    )}
+  </View>
+));
+
 const BottomNavigation = () => {
   const { isTabBarVisible } = useTabBarVisibility();
 
@@ -33,10 +57,7 @@ const BottomNavigation = () => {
           elevation: 20,
           backgroundColor: '#FFFFFF',
           shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: -2,
-          },
+          shadowOffset: { width: 0, height: -2 },
           shadowOpacity: 0.1,
           shadowRadius: 8,
         },
@@ -45,162 +66,78 @@ const BottomNavigation = () => {
         tabBarInactiveTintColor: '#9CA3AF',
       }}
     >
-      {/* Home */}
       <Tab.Screen
         name="HomeTab"
         component={HomeStackNavigator}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={styles.tabItem}>
-              {focused && <View style={styles.activeIndicator} />}
-              <View style={[
-                styles.iconContainer,
-                { backgroundColor: focused ? '#5B6BEE' : 'transparent' }
-              ]}>
-                <Image
-                  source={
-                    focused
-                      ? require('../assets/icons/Home.png')
-                      : require('../assets/icons/HomeMT.png')
-                  }
-                  style={styles.icon}
-                />
-              </View>
-              {focused ? <Text style={[
-                styles.label,
-                { color: focused ? '#5B6BEE' : '#9CA3AF' }
-              ]}>
-                Home
-              </Text> : null}
-            </View>
+            <TabIcon
+              focused={focused}
+              label="Home"
+              activeIcon={require('../assets/icons/Home.png')}
+              inactiveIcon={require('../assets/icons/HomeMT.png')}
+            />
           )
         }}
       />
 
-      {/* Category */}
       <Tab.Screen
         name="CategoryTab"
         component={CategoryStackNavigator}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={styles.tabItem}>
-              {focused && <View style={styles.activeIndicator} />}
-              <View style={[
-                styles.iconContainer,
-                { backgroundColor: focused ? '#5B6BEE' : 'transparent' }
-              ]}>
-                <Image
-                  source={
-                    focused
-                      ? require('../assets/icons/Category.png')
-                      : require('../assets/icons/Category1.png')
-                  }
-                  style={styles.icon}
-                />
-              </View>
-              {focused ? <Text style={[
-                styles.label,
-                { color: focused ? '#5B6BEE' : '#9CA3AF' }
-              ]}>
-                Category
-              </Text> : null}
-            </View>
+            <TabIcon
+              focused={focused}
+              label="Category"
+              activeIcon={require('../assets/icons/Category.png')}
+              inactiveIcon={require('../assets/icons/Category1.png')}
+            />
           )
         }}
       />
 
-      {/* Cart */}
       <Tab.Screen
         name="CartTab"
         component={CartStackNavigator}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={styles.tabItem}>
-              {focused && <View style={styles.activeIndicator} />}
-              <View style={[
-                styles.iconContainer,
-                { backgroundColor: focused ? '#5B6BEE' : 'transparent' }
-              ]}>
-                <Image
-                  source={
-                    focused
-                      ? require('../assets/icons/Bag.png')
-                      : require('../assets/icons/Bag1.png')
-                  }
-                  style={[styles.icon, { height: 22, width: 22 }]}
-                />
-              </View>
-              {focused ? <Text style={[
-                styles.label,
-                { color: focused ? '#5B6BEE' : '#9CA3AF' }
-              ]}>
-                Cart
-              </Text> : null}
-            </View>
+            <TabIcon
+              focused={focused}
+              label="Cart"
+              activeIcon={require('../assets/icons/Bag.png')}
+              inactiveIcon={require('../assets/icons/Bag1.png')}
+              iconStyle={{ height: 22, width: 22 }}
+            />
           )
         }}
       />
 
-      {/* Order */}
       <Tab.Screen
         name="Order"
         component={OrderScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={styles.tabItem}>
-              {focused && <View style={styles.activeIndicator} />}
-              <View style={[
-                styles.iconContainer,
-                { backgroundColor: focused ? '#5B6BEE' : 'transparent' }
-              ]}>
-                <Image
-                  source={
-                    focused
-                      ? require('../assets/icons/Buy.png')
-                      : require('../assets/icons/Buy1.png')
-                  }
-                  style={styles.icon}
-                />
-              </View>
-              {focused ? <Text style={[
-                styles.label,
-                { color: focused ? '#5B6BEE' : '#9CA3AF' }
-              ]}>
-                Orders
-              </Text> : null}
-            </View>
+            <TabIcon
+              focused={focused}
+              label="Orders"
+              activeIcon={require('../assets/icons/Buy.png')}
+              inactiveIcon={require('../assets/icons/Buy1.png')}
+            />
           )
         }}
       />
 
-      {/* Profile */}
       <Tab.Screen
         name="ProfileTab"
         component={ProfileStackNavigator}
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={styles.tabItem}>
-              {focused && <View style={styles.activeIndicator} />}
-              <View style={[
-                styles.iconContainer,
-                { backgroundColor: focused ? '#5B6BEE' : 'transparent' }
-              ]}>
-                <Image
-                  source={
-                    focused
-                      ? require('../assets/icons/Profile.png')
-                      : require('../assets/icons/Profile1.png')
-                  }
-                  style={styles.icon}
-                />
-              </View>
-              {focused ? <Text style={[
-                styles.label,
-                { color: focused ? '#5B6BEE' : '#9CA3AF' }
-              ]}>
-                Profile
-              </Text> : null}
-            </View>
+            <TabIcon
+              focused={focused}
+              label="Profile"
+              activeIcon={require('../assets/icons/Profile.png')}
+              inactiveIcon={require('../assets/icons/Profile1.png')}
+            />
           )
         }}
       />

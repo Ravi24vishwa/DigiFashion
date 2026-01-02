@@ -29,7 +29,7 @@ const ViewAllScreen = ({ navigation }) => {
   const { toggleFavorite, isFavorite } = useFavorites();
 
   const handleFavoritePress = (item) => {
-    toggleFavorite(item);
+    toggleFavorite(item.id !== undefined ? item.id : item);
   };
 
 

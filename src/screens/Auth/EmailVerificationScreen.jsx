@@ -17,14 +17,40 @@ import {
     responsiveWidth,
     responsiveHeight,
 } from "react-native-responsive-dimensions";
-import GoogleAndFacebookButtonList from "../Buttons/CustomSocialButton";
-import HeaderTextBlock from "../CommonHelper/HeaderTextBlock";
-const SetNewPassword = ({ navigation }) => {
+import GoogleAndFacebookButtonList from "../../Buttons/CustomSocialButton";
+import HeaderTextBlock from "../../CommonHelper/HeaderTextBlock";
+
+
+import { useDispatch, useSelector } from "react-redux";
+import { sendOtp } from "../../store/slices/authSlice";
+
+
+const EmailVerificationScreen = ({ navigation }) => {
+    const dispatch = useDispatch();
+    const { isLoading } = useSelector(state => state.auth);
+    const [email, setEmail] = useState("");
+
+    const handleSendOtp = async () => {
+        if (!email) {
+            alert("Please enter email");
+            return;
+        }
+        const resultAction = await dispatch(sendOtp(email));
+        console.log('API', resultAction);
+
+
+        if (sendOtp.fulfilled.match(resultAction)) {
+            navigation.navigate('SignUpScreen', { email });
+        } else {
+            const errorMessage = resultAction.payload?.message || "Failed to send OTP";
+            alert(errorMessage);
+        }
+    };
 
     return (
         <View style={styles.container}>
             <ImageBackground
-                source={require("../assets/images/SetNewPasswordScreen.png")}
+                source={require("../../assets/images/ForgotPasswordScreen.png")}
                 style={styles.bgImage}
                 resizeMode="cover"
             />
@@ -40,52 +66,43 @@ const SetNewPassword = ({ navigation }) => {
                 >
                     <View style={styles.BackArrowBtnContainer}>
                         <TouchableOpacity
-                            style={styles.skipButton}
-                            onPress={() => navigation.navigate("VerifyOTPScreen")}
+                            style={styles.BackButton}
+                            onPress={() => navigation.pop()}
                         >
-                            <Image
-                                source={require('../assets/icons/Back.png')}
+                            {/* <Image
+                                source={require('../../assets/icons/Back.png')}
                                 style={styles.ArrowStyle}
-                            />
+                            /> */}
                         </TouchableOpacity>
                     </View>
 
                     {/* Header */}
-
                     <HeaderTextBlock
                         title="Digi"
                         boldPart="FASHION"
-                        subtitle={'Set New Password'}
-                        containerStyle={{ marginLeft: responsiveWidth(9), marginBottom: responsiveHeight(4) }}
-                        subtitleStyle={{ fontSize: RFValue(32), fontWeight: '700' }}
+                        subtitle={'Email Verification'}
+                        containerStyle={{ marginLeft: responsiveWidth(9), marginBottom: responsiveHeight(6) }}
+                        subtitleStyle={{ fontSize: RFValue(26), fontWeight: '700' }}
                     />
-
                     {/* Input Fields */}
                     <View style={styles.formInputFields}>
-                        {/* Email Field */}
-                        <View style={styles.inputWrapper}>
-                            <Image
-                                source={require("../assets/icons/PasswordLock.png")}
-                                style={styles.inputIcon}
-                            />
-                            <TextInput
-                                placeholder="Enter New Password"
-                                placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
-                                keyboardType="email-address"
-                            />
+                        <View style={styles.DiscriptionTxt}>
+                            <Text style={{ color: 'white', fontSize: RFValue(16) }}>Please Verify your Email Id</Text>
                         </View>
                         {/* Email Field */}
                         <View style={styles.inputWrapper}>
                             <Image
-                                source={require("../assets/icons/PasswordLock.png")}
+                                source={require("../../assets/icons/Email.png")}
                                 style={styles.inputIcon}
                             />
                             <TextInput
-                                placeholder="Confirm Password"
+                                placeholder="Enter Email Id"
                                 placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
+                                style={styles.inputField}
                                 keyboardType="email-address"
+                                value={email}
+                                onChangeText={setEmail}
+                                autoCapitalize="none"
                             />
                         </View>
                     </View>
@@ -96,10 +113,10 @@ const SetNewPassword = ({ navigation }) => {
                             width={responsiveWidth(70)}
                             height={responsiveHeight(6.5)}
                             backgroundColor="#637BDD"
-                            title="Save Password"
+                            title={isLoading ? "Sending..." : "Send OTP"}
                             textColor="#FFF"
-                            onPress={() => navigation.navigate('PassSaveSuccessScreen')}
-                            style={styles.SendBtn}
+                            onPress={handleSendOtp}
+                            style={styles.sendButton}
                         />
                     </View>
                 </ScrollView>
@@ -109,7 +126,7 @@ const SetNewPassword = ({ navigation }) => {
 };
 
 
-export default SetNewPassword;
+export default EmailVerificationScreen;
 
 const styles = StyleSheet.create({
     container: {
@@ -121,8 +138,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         bottom: 0,
-        right: 0,
         left: 0,
+        right: 0,
         height: Dimensions.get('screen').height,
     },
 
@@ -133,7 +150,7 @@ const styles = StyleSheet.create({
         height: responsiveHeight(2),
     },
 
-    skipButton: {
+    BackButton: {
         flexDirection: "row",
         alignItems: "center",
     },
@@ -143,17 +160,24 @@ const styles = StyleSheet.create({
         width: 26,
         tintColor: 'white'
     },
-
     /* Input Fields */
     formInputFields: {
-        marginTop: 30,
+        marginTop: 20,
         gap: 23,
+    },
+
+    DiscriptionTxt: {
+        flex: 1,
+        justifyContent: 'center',
+        alignSelf: 'center',
+        width: responsiveWidth(82),
+        // backgroundColor: 'red'
     },
 
     inputWrapper: {
         flexDirection: "row",
         alignItems: "center",
-        width: responsiveWidth(74),
+        width: responsiveWidth(82),
         alignSelf: "center",
         borderBottomWidth: 2,
         borderBottomColor: "white",
@@ -167,7 +191,7 @@ const styles = StyleSheet.create({
         tintColor: "white",
     },
 
-    SignInInputFields: {
+    inputField: {
         flex: 1,
         paddingLeft: 10,
         color: "white",
@@ -178,12 +202,10 @@ const styles = StyleSheet.create({
     /* Buttons */
     buttonContainer: {
         alignItems: "center",
-        marginTop: responsiveHeight(12),
+        marginTop: responsiveHeight(10),
     },
 
-    SendBtn: {
+    sendButton: {
         marginBottom: "4%",
-        fontWeight: '600'
     },
 });
-

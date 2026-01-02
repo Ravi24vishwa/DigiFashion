@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import GoogleAndFacebookButtonList from '../Buttons/CustomSocialButton'
+import GoogleAndFacebookButtonList from '../../Buttons/CustomSocialButton'
 import {
   responsiveWidth,
   responsiveHeight,
@@ -11,7 +11,7 @@ const PassSaveSuccessScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Image
-          source={require('../assets/icons/Successmark.png')}
+          source={require('../../assets/icons/Successmark.png')}
           style={styles.successIcon}
         />
         <Text style={{ fontWeight: '600', fontSize: 35, color: 'black', marginBottom: responsiveHeight(1), marginTop: responsiveHeight(5) }}>Save Successfully</Text>

@@ -2,32 +2,32 @@ import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, Image, Dimen
 import React from 'react'
 import { RFValue } from "react-native-responsive-fontsize";
 import { responsiveWidth, responsiveHeight } from "react-native-responsive-dimensions";
-import HeaderTextBlock from '../CommonHelper/HeaderTextBlock'
+import HeaderTextBlock from '../../CommonHelper/HeaderTextBlock'
 const { width, height } = Dimensions.get('screen');
 
-const IntroScreen = ({navigation}) => {
+const IntroScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <ImageBackground
-                source={require('../assets/images/SplashCleanBackground.png')}
+                source={require('../../assets/images/SplashCleanBackground.png')}
                 style={styles.SplashImage}
             >
-                  <HeaderTextBlock
+                <HeaderTextBlock
                     title="Digi"
                     boldPart="FASHION"
                     subtitle={'Explore the new \nworld of Clothing'}
-                    subtitleStyle={{fontSize: RFValue(26)}}
+                    subtitleStyle={{ fontSize: RFValue(26) }}
                 />
-                
-                <TouchableOpacity
-                    style={styles.explortbtn}
-                   onPress={() => navigation.navigate('PreSignInScreen')}
-                >
-                    <Text style={styles.Exploretxt}>Let's Explore</Text>
 
-                    <Image 
-                        source={require('../assets/icons/ExploreArrow.png')}
-                        style={styles.explortIconImage}
+                <TouchableOpacity
+                    style={styles.exploreButton}
+                    onPress={() => navigation.navigate('EmailVerificationScreen')}
+                >
+                    <Text style={styles.exploreText}>Let's Explore</Text>
+
+                    <Image
+                        source={require('../../assets/icons/ExploreArrow.png')}
+                        style={styles.exploreIconImage}
                     />
                 </TouchableOpacity>
             </ImageBackground>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
         fontSize: RFValue(26),
         textAlign: 'left',
     },
-    explortbtn: {
+    exploreButton: {
         backgroundColor: 'white',
         width: responsiveWidth(75),
         height: responsiveHeight(6.5),
@@ -73,12 +73,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: responsiveWidth(10),
         marginTop: responsiveHeight(49),
     },
-    Exploretxt: {
+    exploreText: {
         color: 'black',
         fontSize: RFValue(18),
         fontWeight: 'bold'
     },
-    explortIconImage:{
+    exploreIconImage: {
         height: responsiveHeight(3.5),
         width: responsiveWidth(7),
         resizeMode: 'contain'

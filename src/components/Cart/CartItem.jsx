@@ -24,8 +24,8 @@ const CartItem = ({ item, updateQuantity, onOpenSizeModal, onRemove }) => (
                         style={styles.sizeDropdown}
                         onPress={() => onOpenSizeModal(item)}
                     >
-                        <Text style={styles.sizeDropdownText}>{item.size || 'XXL'}</Text>
-                        <Image source={require('./../../assets/icons/DownArrow.png')} style={styles.dropdownArrow} />
+                        <Text style={styles.sizeDropdownText}>{item.size}</Text>
+                        <Image source={require('./../../assets/icons/DownArrow1.png')} style={styles.dropdownArrow} />
                     </TouchableOpacity>
                 </View>
 

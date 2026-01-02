@@ -17,8 +17,8 @@ import {
     responsiveWidth,
     responsiveHeight,
 } from "react-native-responsive-dimensions";
-import GoogleAndFacebookButtonList from "../Buttons/CustomSocialButton";
-import HeaderTextBlock from "../CommonHelper/HeaderTextBlock";
+import GoogleAndFacebookButtonList from "../../Buttons/CustomSocialButton";
+import HeaderTextBlock from "../../CommonHelper/HeaderTextBlock";
 
 
 const ForgotPassScreen = ({ navigation }) => {
@@ -29,7 +29,7 @@ const ForgotPassScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <ImageBackground
-                source={require("../assets/images/ForgotPasswordScreen.png")}
+                source={require("../../assets/images/ForgotPasswordScreen.png")}
                 style={styles.bgImage}
                 resizeMode="cover"
             />
@@ -49,7 +49,7 @@ const ForgotPassScreen = ({ navigation }) => {
                             onPress={() => navigation.pop()}
                         >
                             <Image
-                                source={require('../assets/icons/Back.png')}
+                                source={require('../../assets/icons/Back.png')}
                                 style={styles.ArrowStyle}
                             />
                         </TouchableOpacity>
@@ -71,7 +71,7 @@ const ForgotPassScreen = ({ navigation }) => {
                         {/* Email Field */}
                         <View style={styles.inputWrapper}>
                             <Image
-                                source={require("../assets/icons/Email.png")}
+                                source={require("../../assets/icons/Email.png")}
                                 style={styles.inputIcon}
                             />
                             <TextInput
@@ -93,7 +93,8 @@ const ForgotPassScreen = ({ navigation }) => {
                             backgroundColor="#637BDD"
                             title="Send"
                             textColor="#FFF"
-                            onPress={() => navigation.navigate('VerifyOTPScreen')}
+                            // onPress={() => navigation.navigate('VerifyOTPScreen')}
+                            onPress={() => console.log('navigate to new password screen if possible')}
                             style={styles.SendBtn}
                         />
                     </View>

@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react';
-import { SafeAreaView, StatusBar, FlatList, StyleSheet } from 'react-native';
+import { SafeAreaView, StatusBar, FlatList, StyleSheet, InteractionManager } from 'react-native';
 import { CommonHeader } from '../../../components/CommonHeader';
 import { FilterBar } from '../../../components/FilterBar';
 
@@ -35,7 +35,6 @@ const CategoryProductsScreen = ({ navigation, route }) => {
   // ─────────────────────────────
   const [selectedSort, setSelectedSort] = useState('Popular');
   const [selectedCategory, setSelectedCategory] = useState('T-shirts');
-
   const [selectedFilters, setSelectedFilters] = useState({});
 
   // ─────────────────────────────
@@ -50,7 +49,7 @@ const CategoryProductsScreen = ({ navigation, route }) => {
   // ─────────────────────────────
   const sortSnapPoints = useMemo(() => ['50%'], []);
   const categorySnapPoints = useMemo(() => ['50%'], []);
-  const filterSnapPoints = useMemo(() => ['85%'], []);
+  const filterSnapPoints = useMemo(() => ['73%'], []);
 
   // ─────────────────────────────
   // SELECT HANDLERS
@@ -83,34 +82,40 @@ const CategoryProductsScreen = ({ navigation, route }) => {
   // UI
   // ─────────────────────────────
 
-  const [ClothProductData, setClothProductData] = useState(saleItems)
+  const [ClothProductData, setClothProductData] = useState([]);
+  const [isReady, setIsReady] = useState(false);
 
+  // Optimize initial load - wait for transition to finish
   useEffect(() => {
+    const interactionPromise = InteractionManager.runAfterInteractions(() => {
+      setIsReady(true);
+      // Set initial data after transition
+      applyFilters();
+    });
+
+    return () => interactionPromise.cancel();
+  }, []);
+
+  // Filter application logic reused for both initial load and updates
+  const applyFilters = useCallback(() => {
     let filteredData = [...saleItems];
 
-    // 1. Filter by Selected Category (from Bottom Sheet)
+    // 1. Filter by Selected Category
     if (selectedCategory && selectedCategory !== 'All') {
-      // Check if item.category matches selectedCategory (e.g. 'T-shirts' === 'T-shirts')
-      // Case insensitive check might be safer
       filteredData = filteredData.filter(item =>
         item.category?.toLowerCase() === selectedCategory?.toLowerCase()
       );
     }
 
-    // 2. Filter by Attributes (Bottom Sheet Filters)
-    // selectedFilters format: { color: ['Red', 'Blue'], size: ['M'] }
+    // 2. Filter by Attributes
     Object.keys(selectedFilters).forEach(filterKey => {
       const selectedValues = selectedFilters[filterKey];
       if (selectedValues && selectedValues.length > 0) {
         filteredData = filteredData.filter(item => {
-          const itemValue = item[filterKey]; // e.g. item.color (Array or String)
-
+          const itemValue = item[filterKey];
           if (Array.isArray(itemValue)) {
-            // If item has ['Pink', 'Red'] and filter is ['Red'], match!
-            // Check if ANY of the item's values are in the selectedValues
             return itemValue.some(val => selectedValues.includes(val));
           } else {
-            // If item has 'Pink' and filter is ['Pink', 'Blue'], match!
             return selectedValues.includes(itemValue);
           }
         });
@@ -129,7 +134,8 @@ const CategoryProductsScreen = ({ navigation, route }) => {
         break;
       case 'Newest':
       case 'newest':
-        filteredData.sort((a, b) => b.id - a.id); // Assuming higher ID is newer
+        // Assuming higher ID is newer
+        filteredData.sort((a, b) => b.id - a.id);
         break;
       case 'Customer review':
       case 'review':
@@ -138,20 +144,25 @@ const CategoryProductsScreen = ({ navigation, route }) => {
       case 'Popular':
       case 'popular':
       default:
-        // Default sort (maybe by review count or original order)
-        // filteredData.sort((a, b) => b.reviewCount - a.reviewCount);
-        filteredData.sort((a, b) => b.reviews.length - a.reviews.length);
+        // Default sort by review count
+        filteredData.sort((a, b) => (b.reviews?.length || 0) - (a.reviews?.length || 0));
         break;
     }
 
     setClothProductData(filteredData);
-
   }, [selectedCategory, selectedFilters, selectedSort]);
+
+  // Run filters when dependencies change, but only if view is ready
+  useEffect(() => {
+    if (isReady) {
+      applyFilters();
+    }
+  }, [isReady, applyFilters]);
 
   const { toggleFavorite, isFavorite } = useFavorites();
 
   const handleFavoritePress = (item) => {
-    toggleFavorite(item);
+    toggleFavorite(item.id !== undefined ? item.id : item);
   };
 
   return (

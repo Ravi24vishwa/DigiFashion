@@ -13,7 +13,7 @@ export const CommonHeader = ({
     onBackPress,
     onSearchPress,
     onCartPress,
-    // onWishlistPress,
+    onWishlistPress,
     onSharePress,
     cartBadgeCount
 }) => {

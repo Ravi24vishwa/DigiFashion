@@ -2,15 +2,17 @@ import React, { useRef } from "react";
 import { View, Dimensions, StyleSheet } from "react-native";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
 import CarouselBanner from "./CarouselBanner";
-import { bannerData } from "./bannerData";
+import { bannerData } from "../data/homeBannerData";
 import { useSharedValue } from 'react-native-reanimated';
 import { interpolate, Extrapolation } from 'react-native-reanimated';
 
 const { width } = Dimensions.get("window");
 
-const BannerCarousel = () => {
+const BannerCarousel = ({ data = [] }) => {
   const progress = useSharedValue(0);
   const ref = useRef(null);
+
+  const displayData = data.length > 0 ? data : bannerData;
 
   const onPressPagination = (index) => {
     ref.current?.scrollTo({
@@ -25,7 +27,7 @@ const BannerCarousel = () => {
         ref={ref}
         width={width}
         height={220}
-        data={bannerData}
+        data={displayData}
         loop
         autoPlay
         autoPlayInterval={5000}
@@ -41,7 +43,7 @@ const BannerCarousel = () => {
       <View style={styles.paginationContainer}>
         <Pagination.Custom
           progress={progress}
-          data={bannerData}
+          data={displayData}
           size={20}
           dotStyle={{
             borderRadius: 16,

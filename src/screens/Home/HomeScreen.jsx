@@ -1,26 +1,59 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
   Image,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import BannerCarousel from '../../CommonHelper/BannerCarousel';
 import CustomProductList from '../../CommonHelper/CustomProductList'
 import PromoBanner from '../../CommonHelper/PromoBanner'
-import { saleItems } from '../../data/productdata'
 import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { useFavorites } from '../../contexts/FavoritesContext';
+import { api } from '../../api/apiService';
 
 const HomeScreen = ({ navigation }) => {
-  const [saleProduct, setSaleProduct] = useState(saleItems)
-  const { ProductList, SectionHeader } = CustomProductList
-  const { toggleFavorite, isFavorite } = useFavorites();
+  const [sliders, setSliders] = useState([]);
+  const [homeData, setHomeData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleFavoritePress = (item) => {
-    toggleFavorite(item);
-  };
+  const { ProductList, SectionHeader } = CustomProductList
+  const { toggleFavorite, isFavorite, refreshFavorites } = useFavorites();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const slidersRes = await api.get('sliders');
+        setSliders(slidersRes.data || []);
+
+        const homeRes = await api.get('homedata?store_id=1'); // Default store_id
+        setHomeData(homeRes.data);
+
+        refreshFavorites();
+      } catch (error) {
+        console.error('Error fetching home data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [refreshFavorites]);
+
+  const handleFavoritePress = useCallback((item) => {
+    toggleFavorite(item.id || item.product_id || item);
+  }, [toggleFavorite]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#637BDD" />
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFF' }}>
@@ -74,74 +107,31 @@ const HomeScreen = ({ navigation }) => {
           <Text style={{ color: '#999', marginLeft: responsiveWidth(1.5) }}>What are you looking for...</Text>
         </TouchableOpacity>
 
-        <BannerCarousel />
+        <BannerCarousel data={sliders} />
 
-        {/* Sale Section */}
-        <SectionHeader
-          title="Sale"
-          subtitle="Super summer sale"
-          onViewAll={() => navigation.navigate('ViewAll', saleProduct.filter(item => item.Season === 'Sales').map(item => ({
-            ...item,
-            isFavorite: isFavorite(item.id)
-          })))}
-        />
-        <ProductList
-          products={saleProduct.filter(item => item.Season === 'Sales').map(item => ({
-            ...item,
-            isFavorite: isFavorite(item.id)
-          }))}
-          showOldPrice={true}
-          showDiscount={true}
-          showFavorite={true}
-          onProductPress={(item) => navigation.navigate('ProductDetailScreen', item)}
-          onFavoritePress={handleFavoritePress}
-        />
+        {/* Categories / Sections from homeData */}
+        {homeData?.categories?.map((category, index) => (
+          <React.Fragment key={category.id || index}>
+            <SectionHeader
+              title={category.name}
+              subtitle={category.description || `Explore ${category.name}`}
+              onViewAll={() => navigation.navigate('CategoryProducts', { id: category.id, title: category.name })}
+            />
+            <ProductList
+              products={category.products?.map(p => ({ ...p, isFavorite: isFavorite(p.id) })) || []}
+              showOldPrice={true}
+              showDiscount={true}
+              showFavorite={true}
+              onProductPress={(item) => navigation.navigate('ProductDetailScreen', { slug: item.slug })}
+              onFavoritePress={handleFavoritePress}
+            />
+          </React.Fragment>
+        ))}
 
-        {/* New Section */}
-        <SectionHeader
-          title="New"
-          subtitle="You’ve never seen it before!"
-          onViewAll={() => navigation.navigate('ViewAll', saleProduct.filter(item => item.Season === 'New').map(item => ({
-            ...item,
-            isFavorite: isFavorite(item.id)
-          })))}
-        />
-        <ProductList
-          products={saleProduct.filter(item => item.Season === 'New').map(item => ({
-            ...item,
-            isFavorite: isFavorite(item.id)
-          }))}
-          showOldPrice={true}
-          showDiscount={true}
-          showFavorite={true}
-          onProductPress={(item) => navigation.navigate('ProductDetailScreen', item)}
-          onFavoritePress={handleFavoritePress}
-        />
-
-        {/* Promo Banner */}
+        {/* Fallback Static Banners if needed */}
         <PromoBanner imageUrl={require('../../assets/images/HomeScreenImages/PromoBanner1.png')} />
         <PromoBanner imageUrl={require('../../assets/images/HomeScreenImages/PromoBanner2.png')} />
 
-        {/* Top Section */}
-        <SectionHeader
-          title="Top"
-          subtitle="You’ve never seen it before!"
-          onViewAll={() => navigation.navigate('ViewAll', saleProduct.filter(item => item.Season === 'Top').map(item => ({
-            ...item,
-            isFavorite: isFavorite(item.id)
-          })))}
-        />
-        <ProductList
-          products={saleProduct.filter(item => item.Season === 'Top').map(item => ({
-            ...item,
-            isFavorite: isFavorite(item.id)
-          }))}
-          showOldPrice={true}
-          showDiscount={true}
-          showFavorite={true}
-          onProductPress={(item) => navigation.navigate('ProductDetailScreen', item)}
-          onFavoritePress={handleFavoritePress}
-        />
       </ScrollView>
     </View>
   );

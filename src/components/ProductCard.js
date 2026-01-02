@@ -1,12 +1,8 @@
 // ==================== ProductCard.js ====================
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
-export const ProductCard = ({ item, onPress, isfavorite }) => {
-
-  
-
-  const handlefavorite = () => {}
+export const ProductCard = memo(({ item, onPress, isfavorite, onFavoritePress }) => {
   return (
     <TouchableOpacity style={styles.productCard} onPress={onPress}>
       {/* Sale Badge */}
@@ -17,10 +13,17 @@ export const ProductCard = ({ item, onPress, isfavorite }) => {
       )}
 
       {/* Favorite Button */}
-      <TouchableOpacity style={styles.favoriteButton}
-      onPress={()=>handlefavorite()}>
+      <TouchableOpacity
+        style={styles.favoriteButton}
+        onPress={() => onFavoritePress && onFavoritePress(item)}
+      >
         <Image
-          source={require('../assets/icons/Heart1.png')}
+          source={
+            // Check both the passed prop and the item property for robustness
+            (isfavorite || item.isFavorite)
+              ? require('../assets/icons/Heart.png') // Filled heart
+              : require('../assets/icons/Heart1.png') // Empty heart
+          }
           style={styles.favoriteIcon}
         />
       </TouchableOpacity>
@@ -40,7 +43,7 @@ export const ProductCard = ({ item, onPress, isfavorite }) => {
       </View>
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   productCard: {

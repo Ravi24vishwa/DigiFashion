@@ -79,12 +79,12 @@ const CartScreen = ({ navigation }) => {
   }, [currentStep, setIsTabBarVisible]);
 
   const handleContinueShopping = () => {
-    // If you have a clear cart function in context, call it here
-    if (clearCart) clearCart();
-    navigation.navigate('HomeTab'); // Adjust to your actual Main/Home route name
+    setCurrentStep(1); // Reset internal state
+    navigation.navigate('HomeTab');
   };
 
   const handlePlaceOrder = () => {
+    clearCart();
     setCurrentStep(4);
   };
 

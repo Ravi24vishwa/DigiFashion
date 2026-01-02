@@ -5,28 +5,45 @@ import {
   responsiveWidth,
   responsiveHeight,
 } from "react-native-responsive-dimensions";
-import GoogleAndFacebookButtonList from '../Buttons/CustomSocialButton'
-import OtpInput from '../CommonHelper/OTPInput'
-import HeaderTextBlock from '../CommonHelper/HeaderTextBlock';
-const VerifyOTPScreen = ({ navigation }) => {
-  const [Submittedotp, setSubmittedotp] = useState("")
+import GoogleAndFacebookButtonList from '../../Buttons/CustomSocialButton'
+import OtpInput from '../../CommonHelper/OTPInput'
+import HeaderTextBlock from '../../CommonHelper/HeaderTextBlock';
+import { useDispatch, useSelector } from 'react-redux';
+import { verifyOtp } from '../../store/slices/authSlice';
 
-  const handleotp = (otp) => {
-    setSubmittedotp(otp)
-  }
+const VerifyOTPScreen = ({ navigation, route }) => {
+  const dispatch = useDispatch();
+  const { userData } = route.params || {};
+  const { isLoading, token } = useSelector(state => state.auth);
+  const [submittedOtp, setSubmittedOtp] = useState("");
 
-  const handleVerify = () => {
-    if (Submittedotp.length !== 4) {
-      alert("Please Enter OTP")
+  const handleOtpChange = (otp) => {
+    setSubmittedOtp(otp);
+  };
+
+  const handleVerify = async () => {
+    if (submittedOtp.length < 6) {
+      alert("Please Enter OTP");
       return;
     }
-    navigation.navigate('SetNewPassword')
-  }
+
+    const resultAction = await dispatch(verifyOtp({
+      ...userData,
+      otp: submittedOtp
+    }));
+
+    if (verifyOtp.fulfilled.match(resultAction)) {
+      navigation.replace("Main");
+    } else {
+      const errorMessage = resultAction.payload?.message || "Verification failed";
+      alert(errorMessage);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../assets/images/OTPScreen.png')}
+        source={require('../../assets/images/SignUpOTPScreen.png')}
         style={styles.bgScreen}
         resizeMode="cover"
       />
@@ -56,7 +73,7 @@ const VerifyOTPScreen = ({ navigation }) => {
           />
           {/* OTP Input field */}
           <View style={styles.OTPContainer}>
-            <OtpInput onChangeOTP={handleotp} />
+            <OtpInput onChangeOTP={handleOtpChange} />
           </View>
 
           {/* verify button */}

@@ -104,7 +104,7 @@ const MyProduct = ({ navigation, route }) => {
                 )}
                 {/* Favorite Button */}
                 <TouchableOpacity
-                    onPress={() => toggleFavorite(item)}
+                    onPress={() => toggleFavorite(item.id !== undefined ? item.id : item)}
                     style={styles.favoriteBtn}
                 >
                     <Image

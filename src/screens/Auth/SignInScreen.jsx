@@ -11,14 +11,15 @@ import {
     ScrollView,
     Dimensions
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
     responsiveWidth,
     responsiveHeight,
 } from "react-native-responsive-dimensions";
-import SignUpButton from "../Buttons/SignUpButton";
-import HeaderTextBlock from "../CommonHelper/HeaderTextBlock";
+import SignUpButton from "../../Buttons/SignUpButton";
+import HeaderTextBlock from "../../CommonHelper/HeaderTextBlock";
 // const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Custom Checkbox Component
@@ -37,25 +38,40 @@ const CustomCheckBox = ({ value, onValueChange }) => {
 };
 
 const SignInScreen = ({ navigation }) => {
-    const [ShowPassword, setShowPassword] = useState(false);
-    const [isSelected, setIsSelected] = useState(false);
+    const dispatch = useDispatch();
+    const { isLoading, error, token } = useSelector((state) => state.auth);
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [isRememberMeChecked, setIsRememberMeChecked] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSignIn = () => {
+
+
+    const handleSignIn = async () => {
         if (!email || !password) {
             alert("Please enter email and password");
             return;
         }
-        // Proceed to proper navigation or auth check
-        navigation.replace("Main");
+
+        const resultAction = await dispatch(login({
+            email,
+            password,
+            remember_me: isRememberMeChecked,
+            device_id: "BE2A.250530.026.D1xx"
+        }));
+
+        if (!login.fulfilled.match(resultAction)) {
+            const errorMessage = resultAction.payload?.message || "Login failed";
+            alert(errorMessage);
+        }
     };
 
     return (
         <View style={styles.container}>
             {/* Fixed Background Image */}
             <ImageBackground
-                source={require("../assets/images/SignInScreen.png")}
+                source={require("../../assets/images/SignInScreen.png")}
                 style={styles.bgImage}
                 resizeMode="cover"
             />
@@ -87,7 +103,7 @@ const SignInScreen = ({ navigation }) => {
                         {/* Email Field */}
                         <View style={styles.inputWrapper}>
                             <Image
-                                source={require("../assets/icons/Email.png")}
+                                source={require("../../assets/icons/Email.png")}
                                 style={styles.inputIcon}
                             />
                             <TextInput
@@ -104,26 +120,26 @@ const SignInScreen = ({ navigation }) => {
                         {/* Password Field */}
                         <View style={styles.inputWrapper}>
                             <Image
-                                source={require("../assets/icons/PasswordLock.png")}
+                                source={require("../../assets/icons/PasswordLock.png")}
                                 style={styles.inputIcon}
                             />
                             <TextInput
                                 placeholder="Password"
                                 placeholderTextColor="rgba(255,255,255,0.7)"
                                 style={styles.SignInInputFields}
-                                secureTextEntry={!ShowPassword}
+                                secureTextEntry={!showPassword}
                                 value={password}
                                 onChangeText={setPassword}
                             />
                             <TouchableOpacity
-                                onPress={() => setShowPassword(!ShowPassword)}
+                                onPress={() => setShowPassword(!showPassword)}
                             >
                                 <View style={styles.EyeIconSpace}>
                                     <Image
                                         source={
-                                            ShowPassword
-                                                ? require("../assets/icons/Show.png")
-                                                : require("../assets/icons/Hide.png")
+                                            showPassword
+                                                ? require("../../assets/icons/Show.png")
+                                                : require("../../assets/icons/Hide.png")
                                         }
                                         style={styles.passwordicon}
                                     />
@@ -136,8 +152,8 @@ const SignInScreen = ({ navigation }) => {
                     <View style={styles.checkBoxContainer}>
                         <View style={styles.rememberMeContainer}>
                             <CustomCheckBox
-                                value={isSelected}
-                                onValueChange={setIsSelected}
+                                value={isRememberMeChecked}
+                                onValueChange={setIsRememberMeChecked}
                             />
                             <Text style={styles.checkboxtxt}>Remember Me</Text>
                         </View>

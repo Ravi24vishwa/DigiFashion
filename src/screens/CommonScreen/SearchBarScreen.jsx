@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import SearchBar from "../../components/SearchBar";
 import { useNavigation } from "@react-navigation/native";
 import { saleItems } from "../../data/productdata";
+import { responsiveWidth } from 'react-native-responsive-dimensions';
 
 const SearchBarScreen = () => {
   const navigation = useNavigation();
@@ -60,16 +61,18 @@ const SearchBarScreen = () => {
             }}
             onPress={() => navigation.navigate("ProductDetailScreen", item)}
           >
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 16, color: "#000" }}>{item.title}</Text>
-              <Text style={{ fontSize: 13, color: "#666", marginTop: 2 }}>
-                {item.category} {item.gender ? `| ${item.gender}` : ""}
-              </Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Image
+                source={item.image}
+                style={{ width: responsiveWidth(15), height: responsiveWidth(15), borderRadius: 10 }}
+              />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={{ fontSize: 16, color: "#000" }}>{item.title}</Text>
+                <Text style={{ fontSize: 13, color: "#666", marginTop: 2 }}>
+                  {item.category} {item.gender ? `| ${item.gender}` : ""}
+                </Text>
+              </View>
             </View>
-            <Image
-              source={require("../../assets/icons/Line.png")}
-              style={{ width: 14, height: 14, tintColor: "#ccc" }}
-            />
           </TouchableOpacity>
         )}
         ListEmptyComponent={

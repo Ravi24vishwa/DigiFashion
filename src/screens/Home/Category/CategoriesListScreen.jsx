@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
 import PagerView from 'react-native-pager-view';
-import {kidsCategories, menCategories, womenCategories} from '../../../data/catogoryListScreenData'
+import { kidsCategories, menCategories, womenCategories } from '../../../data/catogoryListScreenData'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -52,23 +52,11 @@ const CategoriesListScreen = ({ navigation }) => {
       <FlatList
         data={pageData}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.categoryCard}
-            onPress={() => navigation.navigate('CategoryProducts', {
-              categoryName: item.name,
-              gender: tabs[index].name
-            })}
-          >
-            <Image source={item.image} style={styles.categoryImage} />
-            <View style={styles.categoryInfo}>
-              <Text style={styles.categoryName}>{item.name}</Text>
-              <Text style={styles.categoryItems}>{item.items}</Text>
-            </View>
-            <Image
-              source={require('../../../assets/icons/Forward.png')}
-              style={styles.arrowIcon}
-            />
-          </TouchableOpacity>
+          <CategoryItem
+            item={item}
+            gender={tabs[index].name}
+            navigation={navigation}
+          />
         )}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
@@ -77,17 +65,19 @@ const CategoriesListScreen = ({ navigation }) => {
     </View>
   );
 
+
+
   // Calculate tab width
   const tabWidth = (responsiveWidth(100) - 40) / tabs.length;
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Categories</Text>
-        <TouchableOpacity style={styles.searchButton}     onPress={()=>(navigation.navigate("SearchBarScreen"))}>
+        <TouchableOpacity style={styles.searchButton} onPress={() => (navigation.navigate("SearchBarScreen"))}>
           <Image
             source={require('../../../assets/icons/search.png')}
             style={styles.searchIcon}
@@ -118,7 +108,7 @@ const CategoriesListScreen = ({ navigation }) => {
             </TouchableOpacity>
           ))}
         </View>
-        
+
         {/* Animated Underline */}
         <Animated.View
           style={[
@@ -149,6 +139,27 @@ const CategoriesListScreen = ({ navigation }) => {
     </SafeAreaView>
   );
 };
+
+// Category Item Component
+const CategoryItem = React.memo(({ item, gender, navigation }) => (
+  <TouchableOpacity
+    style={styles.categoryCard}
+    onPress={() => navigation.navigate('CategoryProducts', {
+      categoryName: item.name,
+      gender: gender
+    })}
+  >
+    <Image source={item.image} style={styles.categoryImage} />
+    <View style={styles.categoryInfo}>
+      <Text style={styles.categoryName}>{item.name}</Text>
+      <Text style={styles.categoryItems}>{item.items}</Text>
+    </View>
+    <Image
+      source={require('../../../assets/icons/Forward.png')}
+      style={styles.arrowIcon}
+    />
+  </TouchableOpacity>
+));
 
 const styles = StyleSheet.create({
   container: {

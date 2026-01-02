@@ -1,72 +1,56 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useMemo, useCallback } from 'react';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import {
+  addToCartAsync as rtAddToCart,
+  removeFromCartAsync as rtRemoveFromCart,
+  fetchCart as rtFetchCart,
+  clearCart as rtClearCart,
+} from '../store/slices/cartSlice';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState([]);
+  const dispatch = useDispatch();
+  const { items: cartItems, isLoading, error } = useSelector((state) => state.cart, shallowEqual) || {};
 
-    const addToCart = (product) => {
-        setCartItems((prevItems) => {
-            // Check if item already exists
-            const existingItem = prevItems.find((item) => item.id === product.id);
-            if (existingItem) {
-                return prevItems.map((item) =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                );
-            }
-            return [...prevItems, { ...product, quantity: 1 }];
-        });
-    };
+  const addToCart = useCallback((productInfo) => {
+    // productInfo should contain { productId, shopId, qty, deviceId }
+    dispatch(rtAddToCart(productInfo));
+  }, [dispatch]);
 
-    const removeFromCart = (productId) => {
-        setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
-    };
+  const removeFromCart = useCallback((cartItemId) => {
+    dispatch(rtRemoveFromCart(cartItemId));
+  }, [dispatch]);
 
-    const updateQuantity = (productId, type) => {
-        setCartItems((prevItems) =>
-            prevItems.map((item) => {
-                if (item.id === productId) {
-                    const newQuantity = type === 'increase' ? item.quantity + 1 : item.quantity - 1;
-                    return { ...item, quantity: Math.max(1, newQuantity) };
-                }
-                return item;
-            })
-        );
-    };
+  const clearCart = useCallback(() => {
+    dispatch(rtClearCart());
+  }, [dispatch]);
 
-    const calculateTotal = () => {
-        return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-    };
+  const refreshCart = useCallback(() => {
+    dispatch(rtFetchCart());
+  }, [dispatch]);
 
-    const clearCart = () => {
-        setCartItems([]);
-    }
+  const calculateTotal = useCallback(() => {
+    if (!cartItems) return 0;
+    return cartItems.reduce((total, item) => total + (item.price || 0) * (item.quantity || 1), 0);
+  }, [cartItems]);
 
-    const updateCartItem = (productId, updates) => {
-        setCartItems((prevItems) =>
-            prevItems.map((item) =>
-                item.id === productId ? { ...item, ...updates } : item
-            )
-        );
-    };
+  const value = useMemo(() => ({
+    cartItems,
+    isLoading,
+    error,
+    addToCart,
+    removeFromCart,
+    clearCart,
+    refreshCart,
+    calculateTotal,
+  }), [cartItems, isLoading, error, addToCart, removeFromCart, clearCart, refreshCart, calculateTotal]);
 
-    return (
-        <CartContext.Provider
-            value={{
-                cartItems,
-                addToCart,
-                removeFromCart,
-                updateQuantity,
-                updateCartItem,
-                calculateTotal,
-                clearCart
-            }}
-        >
-            {children}
-        </CartContext.Provider>
-    );
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+    </CartContext.Provider>
+  );
 };
 
 export const useCart = () => useContext(CartContext);

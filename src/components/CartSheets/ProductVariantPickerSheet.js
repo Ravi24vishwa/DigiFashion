@@ -12,8 +12,8 @@ export const ProductVariantPickerSheet = ({
     setIsTabBarVisible,
     onColorSizeChange
 }) => {
-    const [selectedSize, setSelectedSize] = useState('L');
-    const [selectedColor, setSelectedColor] = useState('Yellow');
+    const [selectedSize, setSelectedSize] = useState(product?.size[0]);
+    const [selectedColor, setSelectedColor] = useState(product?.color[0]);
 
     const sizes = product?.size;
     // Mock colors matching the image

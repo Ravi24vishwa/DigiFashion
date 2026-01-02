@@ -6,7 +6,7 @@ import Carousel, { Pagination } from "react-native-reanimated-carousel";
 import { ProductInfo } from '../../components/ProductDetails/ProductInfo'
 import {
   bannerData
-} from '../../components/ProductDetails/productReviewData'
+} from '../../data/productReviewData'
 
 import { BottomActionBar, ProductDetails, RatingAndReview, ReviewsSection, SizeSelector } from '../../components/ProductDetails/ProductDetailsCom'
 import { ProductVariantPickerSheet } from '../../components/CartSheets/ProductVariantPickerSheet'
@@ -51,7 +51,7 @@ export default function ProductDetailScreen({ navigation, route }) {
   const handleFavoritePress = (product) => {
     const target = product || saleProduct;
     console.log('Toggling favorite for product:', target?.id, target?.title);
-    toggleFavorite(target);
+    toggleFavorite(target?.id !== undefined ? target.id : target);
   };
 
   const handleSharePress = () => {

@@ -1,0 +1,662 @@
+# Baby Station Hub API - Complete Execution Guide
+
+## Table of Contents
+1. Setup Instructions
+2. Authentication Flow
+3. User Journey Execution Steps
+4. API Endpoints Reference
+5. Testing Scenarios
+
+---
+
+## 1. SETUP INSTRUCTIONS
+
+### Base Configuration
+```
+Development URL: http://192.168.0.108:2205/api/
+Production URL: https://ike.sevenoceansholiday.com/
+```
+
+### Required Tools
+- API Testing Tool (Postman, Thunder Client, or cURL)
+- Valid email address for registration
+- Device ID (e.g., "BE2A.250530.026.D1xx")
+
+### Headers Setup
+For authenticated requests, include:
+```
+Authorization: Bearer {your_token_here}
+Content-Type: application/json
+Accept: application/json
+```
+
+---
+
+## 2. AUTHENTICATION FLOW - STEP BY STEP
+
+### Scenario A: New User Registration
+
+**STEP 1: Send OTP**
+```
+Endpoint: POST /sendOtp
+Body (form-data):
+  email: test@gmail.com
+
+Expected Response: OTP sent to email
+```
+
+**STEP 2: Verify OTP & Register**
+```
+Endpoint: POST /verifyOtp
+Body (form-data):
+  name: Test User
+  email: test@gmail.com
+  phone_no: 1234567890
+  otp: 547006
+  password: 123456
+  confirmpassword: 123456
+  dob: 1995-06-15
+
+Expected Response: User registered successfully with token
+Save the token for future requests!
+```
+
+### Scenario B: Existing User Login
+
+**STEP 1: Login**
+```
+Endpoint: POST /login
+Body (JSON):
+{
+  "email": "test@gmail.com",
+  "password": "Pass@123",
+  "remember_me": false,
+  "device_id": "BE2A.250530.026.D1xx"
+}
+
+Expected Response: Authentication token
+Save this token - you'll need it for all authenticated requests!
+```
+
+### Scenario C: Forgot Password
+
+**STEP 1: Request Password Reset**
+```
+Endpoint: POST /forgot-password
+Body (JSON):
+{
+  "email": "team.sridix@gmail.com"
+}
+
+Expected Response: Password reset instructions sent to email
+```
+
+### Scenario D: Google Login
+
+**STEP 1: Authenticate with Google**
+```
+Endpoint: POST /google-login
+Body (JSON):
+{
+  "email": "test@gmail.com",
+  "password": "Pass@123",
+  "remember_me": false,
+  "device_id": "BE2A.250530.026.D1xx"
+}
+
+Expected Response: Authentication token
+```
+
+---
+
+## 3. COMPLETE USER JOURNEY EXECUTION
+
+### JOURNEY 1: Browse and Add Products to Cart
+
+**STEP 1: Get Home Data**
+```
+Endpoint: GET /homedata?store_id=8
+Auth: Not required
+
+Purpose: Display home page content, featured products
+```
+
+**STEP 2: Get Categories**
+```
+Endpoint: POST /categories
+Auth: Not required
+Body (JSON):
+{
+  "device_id": "UP1A.231005.007",
+  "per_page": 20,
+  "isParent": "0"
+}
+
+Purpose: Display product categories for navigation
+```
+
+**STEP 3: Get Brands**
+```
+Endpoint: GET /brands
+Auth: Not required
+
+Purpose: Display available brands for filtering
+```
+
+**STEP 4: Browse Products (Shop)**
+```
+Endpoint: POST /shop
+Auth: Bearer Token (Optional)
+Body (JSON):
+{
+  "per_page": 100,
+  "page": 1,
+  "store_id": 1,
+  "device_id": "UP1A.231005.007"
+}
+
+Purpose: Display product listing
+Optional filters: search, category_ids, sort_by, price_range, brand
+```
+
+**STEP 5: Search Products**
+```
+Endpoint: POST /product/serach
+Auth: Bearer Token
+Body (JSON):
+{
+  "search": "baby bottle",
+  "store_id": 69
+}
+
+Purpose: Find specific products by keyword
+```
+
+**STEP 6: View Product Details**
+```
+Endpoint: POST /product/
+Auth: Bearer Token
+Body (JSON):
+{
+  "slug": "product-slug-here",
+  "shop_id": 1
+}
+
+Purpose: Display detailed product information
+```
+
+**STEP 7: Add Product to Cart**
+```
+Endpoint: POST /cart/add
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "product_id": 6552,
+  "shop_id": 1,
+  "qty": 2,
+  "device_id": "BE2A.250530.026.D1xx"
+}
+
+Purpose: Add selected product to shopping cart
+```
+
+**STEP 8: View Cart**
+```
+Endpoint: GET /cart/listing
+Auth: Bearer Token (REQUIRED)
+
+Purpose: Display all items in cart with totals
+```
+
+### JOURNEY 2: Manage Favorites
+
+**STEP 1: Add to Favorites**
+```
+Endpoint: POST /favorite
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "product_id": 26
+}
+
+Purpose: Toggle product in favorites (add/remove)
+```
+
+**STEP 2: View Favorites List**
+```
+Endpoint: GET /favorite/list
+Auth: Bearer Token (REQUIRED)
+
+Purpose: Display all favorited products
+```
+
+### JOURNEY 3: Checkout Process
+
+**STEP 1: Initiate Checkout**
+```
+Endpoint: POST /checkout
+Auth: Bearer Token (REQUIRED)
+Headers: Accept: application/json
+Body (JSON):
+{
+  "shop_id": 1,
+  "delivery_type": "store_pickup"
+}
+
+Delivery Types: "store_pickup" or "delivery"
+Purpose: Start checkout process, calculate totals
+```
+
+**STEP 2: Get Available States**
+```
+Endpoint: GET /checkout/address/state
+Auth: Bearer Token (REQUIRED)
+
+Purpose: Get list of states for address form
+```
+
+**STEP 3: View Saved Addresses**
+```
+Endpoint: GET /checkout/address/list
+Auth: Bearer Token (REQUIRED)
+
+Purpose: Display user's saved addresses
+```
+
+**STEP 4: Add/Update Delivery Address**
+```
+Endpoint: POST /checkout/address/add
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "id": 3,
+  "address_type": "home",
+  "address": "123 MG Road",
+  "apt": "Apartment 5B",
+  "city": "Bangalore",
+  "state": 1,
+  "zipcode": "560001",
+  "default": 1,
+  "title": "Home Address"
+}
+
+Note: Omit "id" for new address, include for update
+Purpose: Save delivery address
+```
+
+**STEP 5: Apply Address to Order**
+```
+Endpoint: POST /checkout/address/apply
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "user_address_id": 6,
+  "is_remove": false
+}
+
+Purpose: Select address for current order
+```
+
+**STEP 6: View Available Coupons**
+```
+Endpoint: GET /coupon/list
+Auth: Bearer Token (REQUIRED)
+Headers: Accept: application/json
+
+Purpose: Display available discount coupons
+```
+
+**STEP 7: Apply Coupon**
+```
+Endpoint: POST /coupon-discount
+Auth: Bearer Token (REQUIRED)
+Headers: Accept: application/json
+Body (JSON):
+{
+  "coupon_id": 1,
+  "is_remove": false
+}
+
+Set is_remove to true to remove coupon
+Purpose: Apply discount to order
+```
+
+**STEP 8: Submit Order**
+```
+Endpoint: POST /order/submit
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "delivery_type": "store_pickup",
+  "store_id": 2
+}
+
+Purpose: Place the final order
+Expected Response: Order confirmation with order ID
+```
+
+### JOURNEY 4: Order Management
+
+**STEP 1: View Order History**
+```
+Endpoint: GET /order/list
+Auth: Bearer Token (REQUIRED)
+
+Purpose: Display all user orders
+```
+
+**STEP 2: View Order Details**
+```
+Endpoint: POST /order/details
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "order_id": 3
+}
+
+Purpose: Display detailed information for specific order
+```
+
+**STEP 3: Add Product Review**
+```
+Endpoint: POST /order/review/add
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "product_id": 31,
+  "rating": 5,
+  "review": "Superb performance and great build quality!"
+}
+
+Purpose: Submit review for purchased product
+```
+
+**STEP 4: View Product Reviews**
+```
+Endpoint: POST /order/review/list
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "slug": "product-slug",
+  "limit": 3,
+  "rating": 5
+}
+
+Optional: Filter by rating
+Purpose: Display reviews for a product
+```
+
+### JOURNEY 5: Cart Management
+
+**STEP 1: Update Cart Item Quantity**
+```
+Note: Use cart/add endpoint with updated qty
+Endpoint: POST /cart/add
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "product_id": 6552,
+  "shop_id": 1,
+  "qty": 5,
+  "device_id": "BE2A.250530.026.D1xx"
+}
+```
+
+**STEP 2: Remove Item from Cart**
+```
+Endpoint: POST /cart/delete
+Auth: Bearer Token (REQUIRED)
+Body (JSON):
+{
+  "cart_item_id": 3
+}
+
+Purpose: Remove specific item from cart
+```
+
+---
+
+## 4. CONTENT & INFORMATION ENDPOINTS
+
+### Get Sliders/Banners
+```
+Endpoint: GET /sliders
+Auth: Bearer Token (REQUIRED)
+Headers: Accept: application/json
+
+Purpose: Display promotional sliders on home page
+```
+
+```
+Endpoint: GET /banners
+Auth: Not required
+
+Purpose: Display banner images
+```
+
+### Get Filter Options
+```
+Endpoint: GET /filter-listing
+Auth: Not required
+
+Purpose: Get available filters for product search
+(categories, price ranges, brands, etc.)
+```
+
+### Contact Support
+```
+Endpoint: POST /contact_us
+Auth: Not required
+Body (JSON):
+{
+  "contact": "test@example.com",
+  "message": "I want to know more about your services.",
+  "shop_id": 10
+}
+
+Note: contact can be email or phone number
+Purpose: Submit contact form
+```
+
+### Get App Settings
+```
+Endpoint: GET /panel-setting
+Auth: Not required
+
+Purpose: Get application configuration and settings
+```
+
+### Get Static Pages
+```
+Endpoint: GET /pages
+Auth: Not required
+
+Purpose: Get content for About Us, Terms, Privacy Policy, etc.
+```
+
+### Get FAQs
+```
+Endpoint: GET /faqs
+Auth: Not required
+
+Purpose: Display frequently asked questions
+```
+
+---
+
+## 5. TESTING SCENARIOS
+
+### Test Case 1: Complete Purchase Flow
+```
+1. Register new user (POST /sendOtp → POST /verifyOtp)
+2. Login (POST /login) - Save token
+3. Browse products (POST /shop)
+4. View product details (POST /product/)
+5. Add to cart (POST /cart/add)
+6. View cart (GET /cart/listing)
+7. Checkout (POST /checkout)
+8. Add address (POST /checkout/address/add)
+9. Apply address (POST /checkout/address/apply)
+10. Apply coupon (POST /coupon-discount)
+11. Submit order (POST /order/submit)
+12. Verify order (POST /order/details)
+```
+
+### Test Case 2: Product Search and Filter
+```
+1. Get categories (POST /categories)
+2. Get brands (GET /brands)
+3. Get filter options (GET /filter-listing)
+4. Search products (POST /shop) with filters:
+   - category_ids: [2]
+   - sort_by: "high_to_low"
+   - price_range: "0-100"
+   - brand: "brand_name"
+5. View filtered results
+```
+
+### Test Case 3: Favorites Management
+```
+1. Login (POST /login)
+2. Add product to favorites (POST /favorite)
+3. View favorites list (GET /favorite/list)
+4. Remove from favorites (POST /favorite with same product_id)
+5. Verify removal (GET /favorite/list)
+```
+
+### Test Case 4: Address Management
+```
+1. Get states list (GET /checkout/address/state)
+2. Add new address (POST /checkout/address/add without id)
+3. View address list (GET /checkout/address/list)
+4. Update address (POST /checkout/address/add with id)
+5. Set as default (POST /checkout/address/add with default: 1)
+```
+
+### Test Case 5: Review System
+```
+1. Complete purchase (follow Test Case 1)
+2. Add review (POST /order/review/add)
+3. View reviews (POST /order/review/list)
+4. Filter by rating (POST /order/review/list with rating parameter)
+```
+
+---
+
+## 6. COMMON ISSUES & SOLUTIONS
+
+### Issue 1: Authentication Failed (401)
+```
+Solution:
+- Verify token is valid and not expired
+- Check Authorization header format: "Bearer {token}"
+- Re-login if token expired
+```
+
+### Issue 2: Cart Empty After Logout
+```
+Solution:
+- Cart is user-specific and requires authentication
+- Items added without login are device-specific
+- Login to restore cart
+```
+
+### Issue 3: Address Not Applying
+```
+Solution:
+- Ensure address is saved first (POST /checkout/address/add)
+- Get address ID from response
+- Use correct address ID in apply endpoint
+```
+
+### Issue 4: Coupon Not Working
+```
+Solution:
+- Check coupon eligibility (minimum purchase, expiry)
+- Verify coupon_id is correct
+- Check response for error message
+```
+
+---
+
+## 7. IMPORTANT NOTES
+
+### Authentication
+- Token must be included in all protected endpoints
+- Token format: "Bearer {token}"
+- Store token securely after login/registration
+- Token may expire - handle re-authentication
+
+### Device ID
+- Required for cart operations and login
+- Use consistent device_id for same device
+- Format: "BE2A.250530.026.D1xx" or similar
+
+### Store ID
+- Many endpoints require store_id parameter
+- Get available stores from home data
+- Use appropriate store_id for location-specific data
+
+### Pagination
+- Use "page" and "per_page" parameters
+- Default per_page values may vary
+- Monitor response for total count
+
+### Error Handling
+- Always check response status codes
+- Read error messages in response body
+- Common codes: 200 (success), 401 (unauthorized), 422 (validation error), 500 (server error)
+
+---
+
+## 8. QUICK REFERENCE
+
+### Sort Options
+- newest
+- high_to_low (price)
+- low_to_high (price)
+- a_to_z (alphabetical)
+- z_to_a (reverse alphabetical)
+
+### Delivery Types
+- store_pickup
+- delivery
+
+### Address Types
+- home
+- office
+- other
+
+### HTTP Methods Used
+- GET: Retrieve data
+- POST: Submit/create data
+
+### Required vs Optional Auth
+Required: Cart, Orders, Favorites, Checkout, Reviews
+Optional/Not Required: Home, Categories, Brands, Product Browse, Contact
+
+---
+
+## 9. EXECUTION CHECKLIST
+
+Before starting development:
+□ Set base URL (dev or production)
+□ Configure authentication headers
+□ Test authentication flow
+□ Verify token storage mechanism
+□ Test each endpoint individually
+□ Test complete user journeys
+□ Handle error responses
+□ Implement token refresh logic
+□ Test pagination
+□ Test filter combinations
+□ Verify cart persistence
+□ Test checkout flow completely
+□ Implement logout functionality
+
+---
+
+## END OF GUIDE
+
+For additional support or API updates, contact the development team.
+Last Updated: December 2025

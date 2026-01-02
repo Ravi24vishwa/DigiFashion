@@ -23,18 +23,18 @@ export const similarProducts = [
 export const bannerData = [
   {
     id: 1,
-    image: require('../../assets/images/categories/clothing.png'),
+    image: require('../assets/images/categories/clothing.png'),
   },
   {
     id: 2,
-    image: require('../../assets/images/categories/clothing.png'),
+    image: require('../assets/images/categories/clothing.png'),
   },
   {
     id: 3,
-    image: require('../../assets/images/categories/clothing.png'),
+    image: require('../assets/images/categories/clothing.png'),
   },
   {
     id: 4,
-    image: require('../../assets/images/categories/clothing.png'),
+    image: require('../assets/images/categories/clothing.png'),
   },
 ];

@@ -55,7 +55,7 @@ export const ProductInfo = ({
       {/* rigthside productInfo */}
       <View style={{ flexDirection: 'row', gap: responsiveWidth(4) }}>
         <TouchableOpacity style={{ alignItems: 'center' }}
-          onPress={onPress}
+          onPress={() => onPress && onPress(item)}
         >
           <Image
             source={
@@ -67,7 +67,7 @@ export const ProductInfo = ({
           />
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#9E9E9E' }}>WishList</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{ alignItems: 'center', marginRight: responsiveWidth(2) }} onPress={onShare}>
+        <TouchableOpacity style={{ alignItems: 'center', marginRight: responsiveWidth(2) }} onPress={() => onShare && onShare(item)}>
           <Image
             source={require('../../assets/icons/share.png')}
             style={{ width: responsiveWidth(5.5), height: responsiveHeight(2.8) }}
