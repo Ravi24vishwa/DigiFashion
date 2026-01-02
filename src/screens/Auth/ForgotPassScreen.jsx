@@ -25,7 +25,9 @@ const ForgotPassScreen = ({ navigation }) => {
 
 
     const [email, setEmail] = useState("");
-
+    const HandleNewPassword = () => {
+        navigation.navigate('SetNewPassword')
+    }
     return (
         <View style={styles.container}>
             <ImageBackground
@@ -93,8 +95,8 @@ const ForgotPassScreen = ({ navigation }) => {
                             backgroundColor="#637BDD"
                             title="Send"
                             textColor="#FFF"
-                            // onPress={() => navigation.navigate('VerifyOTPScreen')}
-                            onPress={() => console.log('navigate to new password screen if possible')}
+                            onPress={HandleNewPassword}
+                            // onPress={() => console.log('navigate to new password screen if possible')}
                             style={styles.SendBtn}
                         />
                     </View>

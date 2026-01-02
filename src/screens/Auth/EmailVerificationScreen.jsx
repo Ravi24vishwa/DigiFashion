@@ -119,9 +119,14 @@ const EmailVerificationScreen = ({ navigation }) => {
                             style={styles.sendButton}
                         />
                     </View>
+                    <View style={styles.LoginTextContainer}>
+                        <Text style={styles.LogInText}>Already Have account?
+                            <TouchableOpacity onPress={() => navigation.navigate('SignInScreen')}>
+                                <Text style={styles.boldTxt}> Log In</Text></TouchableOpacity></Text>
+                    </View>
                 </ScrollView>
             </KeyboardAvoidingView>
-        </View>
+        </View >
     );
 };
 
@@ -206,6 +211,9 @@ const styles = StyleSheet.create({
     },
 
     sendButton: {
-        marginBottom: "4%",
+        marginBottom: "2%",
     },
+    LoginTextContainer: { alignSelf: 'center' },
+    LogInText: { fontSize: RFValue(18), color: 'white' },
+    boldTxt: { fontWeight: 'bold', fontSize: RFValue(18), color: 'white' },
 });

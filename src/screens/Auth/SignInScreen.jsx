@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { login } from "../../store/slices/authSlice";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
     responsiveWidth,
@@ -48,22 +49,63 @@ const SignInScreen = ({ navigation }) => {
 
 
 
+    // const handleSignIn = async () => {
+    //     if (!email || !password) {
+    //         alert("Please enter email and password");
+    //         return;
+    //     }
+
+    //     const resultAction = await dispatch(login({
+    //         email,
+    //         password,
+    //         remember_me: isRememberMeChecked,
+    //         device_id: "BE2A.250530.026.D1xx"
+    //     }));
+    //     if (!login.fulfilled.match(resultAction)) {
+    //         const errorMessage = resultAction.payload?.message || "Login failed";
+    //         alert(errorMessage);
+    //     }
+    //     console.log(resultAction)
+    //     console.log(email, password)
+    // };
+
     const handleSignIn = async () => {
-        if (!email || !password) {
+        if (!email.trim() || !password.trim()) {
             alert("Please enter email and password");
             return;
         }
 
-        const resultAction = await dispatch(login({
-            email,
-            password,
-            remember_me: isRememberMeChecked,
-            device_id: "BE2A.250530.026.D1xx"
-        }));
+        try {
+            const payload = {
+                email: email.trim(),
+                password: password,
+                remember_me: isRememberMeChecked,
+                device_id: "BE2A.250530.026.D1xx"
+            };
 
-        if (!login.fulfilled.match(resultAction)) {
-            const errorMessage = resultAction.payload?.message || "Login failed";
-            alert(errorMessage);
+            console.log("LOGIN PAYLOAD:", payload);
+
+            const resultAction = await dispatch(login(payload));
+
+            // ❌ Login failed
+            if (!login.fulfilled.match(resultAction)) {
+                const errorMessage =
+                    resultAction.payload?.message ||
+                    resultAction.error?.message ||
+                    "Login failed";
+                alert(errorMessage);
+                return;
+            }
+
+            // ✅ Login success
+            console.log("LOGIN SUCCESS:", resultAction.payload);
+
+            // Note: Navigation happens automatically in MainNavigation via the token state
+            // navigation.replace("HomeScreen");
+
+        } catch (err) {
+            console.log("LOGIN ERROR:", err);
+            alert("Something went wrong. Please try again.");
         }
     };
 
@@ -169,7 +211,6 @@ const SignInScreen = ({ navigation }) => {
                     <View style={styles.buttonContainer}>
                         <SignUpButton
                             title={"Sign In"}
-                            style={{ marginBottom: responsiveHeight(0) }}
                             onPress={handleSignIn}
                         />
                         <View style={{ flexDirection: 'row', marginTop: responsiveHeight(5) }}>

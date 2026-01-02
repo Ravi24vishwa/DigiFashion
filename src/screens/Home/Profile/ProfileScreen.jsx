@@ -5,10 +5,13 @@ import { useCart } from '../../../contexts/CartContext'
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet'
 import { useTabBarVisibility } from '../../../contexts/TabBarVisibilityContext'
+import { useDispatch } from 'react-redux'
+import { logout } from '../../../store/slices/authSlice'
 
 const ProfileScreen = ({ navigation }) => {
   const { cartItems } = useCart();
   const { setIsTabBarVisible } = useTabBarVisibility();
+  const dispatch = useDispatch();
 
   // Bottom Sheet Ref
   const logoutSheetRef = useRef(null);
@@ -33,7 +36,9 @@ const ProfileScreen = ({ navigation }) => {
   const confirmLogout = () => {
     logoutSheetRef.current?.close();
     setIsTabBarVisible(true);
-    navigation.replace('Auth');
+    // Dispatch logout to clear token and user data
+    // Root navigator (MainNavigation) will automatically switch to the Auth stack
+    dispatch(logout());
   };
 
   const renderBackdrop = useCallback(

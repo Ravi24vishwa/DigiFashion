@@ -253,7 +253,7 @@ const SignUpScreen = ({ navigation, route }) => {
                                 Already a account?{" "}
                             </Text>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate("SignInScreen")}
+                                onPress={() => navigation.replace("SignInScreen")}
                             >
                                 <Text style={styles.linkBold}>
                                     Log in
