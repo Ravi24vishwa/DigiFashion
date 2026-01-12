@@ -6,35 +6,71 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
-import BannerCarousel from '../../CommonHelper/BannerCarousel';
-import CustomProductList from '../../CommonHelper/CustomProductList'
-import PromoBanner from '../../CommonHelper/PromoBanner'
+import { SafeAreaView } from 'react-native-safe-area-context';
+import BannerCarousel from '../../components/features/home/BannerCarousel';
+import CustomProductList from '../../components/features/products/CustomProductList'
+import PromoBanner from '../../components/features/home/PromoBanner'
 import { responsiveWidth } from 'react-native-responsive-dimensions';
-import { useFavorites } from '../../contexts/FavoritesContext';
+import { useFavorites } from '../../hooks';
 import { api } from '../../api/apiService';
+import { products } from '../../constants/data/categoryProductScreenData';
+import { storage } from '../../utils/storage';
+import { STORAGE_KEYS } from '../../constants';
 
 const HomeScreen = ({ navigation }) => {
-  const [sliders, setSliders] = useState([]);
+  const [Banner, setBanner] = useState([])
   const [homeData, setHomeData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const { ProductList, SectionHeader } = CustomProductList
-  const { toggleFavorite, isFavorite, refreshFavorites } = useFavorites();
-
+  const { toggleFavorite, isFavorite, refreshFavorites, removeFavoriteLocally } = useFavorites();
+  const [trendingProduct, settrendingProduct] = useState([])
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
-        const slidersRes = await api.get('sliders');
-        setSliders(slidersRes.data || []);
+        // 1. Try to load from cache first for instant speed
+        const cachedData = await storage.getItem(STORAGE_KEYS.CACHE_HOME_DATA);
+        if (cachedData) {
+          setHomeData(cachedData.home || []);
+          setBanner(cachedData.banners || []);
+          if (cachedData.home?.length > 0) {
+            settrendingProduct(cachedData.home[0].products || []);
+          }
+          setIsLoading(false); // Stop loader early if we have cache
+        }
 
-        const homeRes = await api.get('homedata?store_id=1'); // Default store_id
-        setHomeData(homeRes.data);
+        // 2. Fetch fresh data in the background
+        const [slidersRes, bannerRes, homeRes] = await Promise.all([
+          api.get('sliders'),
+          api.get('banners'),
+          api.get('homedata')
+        ]);
+
+        const freshHome = homeRes.Data || [];
+        const freshBanners = bannerRes.Data || [];
+
+        setHomeData(freshHome);
+        setBanner(freshBanners);
+
+        if (freshHome.length > 0) {
+          const firstSectionProducts = freshHome[0].products || [];
+          settrendingProduct(firstSectionProducts);
+        }
+
+        // 3. Update cache with fresh data
+        await storage.setItem(STORAGE_KEYS.CACHE_HOME_DATA, {
+          home: freshHome,
+          banners: freshBanners,
+          timestamp: Date.now()
+        });
 
         refreshFavorites();
       } catch (error) {
-        console.error('Error fetching home data:', error);
+        console.error('Error in HomeScreen fetchData:', error);
+        setHomeData([]);
+        setBanner([]);
       } finally {
         setIsLoading(false);
       }
@@ -43,27 +79,33 @@ const HomeScreen = ({ navigation }) => {
     fetchData();
   }, [refreshFavorites]);
 
-  const handleFavoritePress = useCallback((item) => {
-    toggleFavorite(item.id || item.product_id || item);
-  }, [toggleFavorite]);
+  const handleFavoritePress = useCallback((item, isLongPress = false) => {
+    const productId = item.id || item.product_id || item;
+    if (isLongPress) {
+      removeFavoriteLocally(productId);
+    } else {
+      toggleFavorite(productId);
+    }
+  }, [toggleFavorite, removeFavoriteLocally]);
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF' }}>
         <ActivityIndicator size="large" color="#637BDD" />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF' }}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
       {/* Header */}
       <View style={{
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
-        paddingTop: 40,
+        paddingTop: 10,
         paddingBottom: 10
       }}>
         <Text style={{ fontSize: 44, color: '#000' }}>
@@ -107,23 +149,33 @@ const HomeScreen = ({ navigation }) => {
           <Text style={{ color: '#999', marginLeft: responsiveWidth(1.5) }}>What are you looking for...</Text>
         </TouchableOpacity>
 
-        <BannerCarousel data={sliders} />
+        <BannerCarousel data={Banner} />
 
         {/* Categories / Sections from homeData */}
-        {homeData?.categories?.map((category, index) => (
-          <React.Fragment key={category.id || index}>
+        {homeData?.map((section, index) => (
+          <React.Fragment key={section.id || index}>
             <SectionHeader
-              title={category.name}
-              subtitle={category.description || `Explore ${category.name}`}
-              onViewAll={() => navigation.navigate('CategoryProducts', { id: category.id, title: category.name })}
+              title={section.flag_name}
+              onViewAll={() => navigation.navigate('ViewAll', { id: section.products, title: section.flag_name })}
             />
             <ProductList
-              products={category.products?.map(p => ({ ...p, isFavorite: isFavorite(p.id) })) || []}
+              products={(section.products || []).map(p => ({
+                ...p,
+                title: p.name || p.title || p.product_name,
+                price: parseFloat(p.product_price || 0),
+                oldPrice: parseFloat(p.product_mrp || 0),
+                imageUrl: p.product_thumbnail_image_url,
+                id: p.id || p.product_id,
+                brand: p.product_brand || p.brand || '',
+                discount: p.product_discount,
+                isFavorite: isFavorite(p.id || p.product_id)
+              }))}
               showOldPrice={true}
               showDiscount={true}
               showFavorite={true}
-              onProductPress={(item) => navigation.navigate('ProductDetailScreen', { slug: item.slug })}
-              onFavoritePress={handleFavoritePress}
+              onProductPress={(item) => navigation.navigate('ProductDetailScreen', { slug: item.product_slug })}
+              onFavoritePress={(item) => handleFavoritePress(item, false)}
+              onFavoriteLongPress={(item) => handleFavoritePress(item, true)}
             />
           </React.Fragment>
         ))}
@@ -133,7 +185,7 @@ const HomeScreen = ({ navigation }) => {
         <PromoBanner imageUrl={require('../../assets/images/HomeScreenImages/PromoBanner2.png')} />
 
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

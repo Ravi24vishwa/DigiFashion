@@ -9,8 +9,8 @@ import CartStackNavigator from './stacks/CartStack';
 import ProfileStackNavigator from './stacks/ProfileStack';
 
 // Import screens (Only those not in stacks)
-import OrderScreen from '../screens/Home/Order/OrderScreen';
-import { useTabBarVisibility } from '../contexts/TabBarVisibilityContext';
+import OrderScreen from '../screens/home/Order/OrderScreen';
+import { useAppUI } from '../hooks';
 
 
 
@@ -41,7 +41,7 @@ const TabIcon = React.memo(({ focused, activeIcon, inactiveIcon, label, iconStyl
 ));
 
 const BottomNavigation = () => {
-  const { isTabBarVisible } = useTabBarVisibility();
+  const { isTabBarVisible } = useAppUI();
 
   return (
     <Tab.Navigator

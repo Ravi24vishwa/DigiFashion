@@ -10,29 +10,58 @@ import {
     Dimensions,
 } from 'react-native';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
-import { CommonHeader } from '../../../components/CommonHeader';
-import { RateReviewSheet } from '../../../components/RateReviewSheet';
-import { useTabBarVisibility } from '../../../contexts/TabBarVisibilityContext';
-import { saleItems } from '../../../data/productdata';
+import { CommonHeader } from '../../../components/layout/CommonHeader';
+import { RateReviewSheet } from '../../../components/features/products/RateReviewSheet';
+import { useAppUI, useOrders } from '../../../hooks';
+import { orderService } from '../../../api/orderService';
+import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
 const OrderDetailScreen = ({ navigation, route }) => {
-    const { order } = route.params || {};
+    const { order: initialOrder } = route.params || {};
+    const [order, setOrder] = useState(initialOrder);
+    const [isOrderLoading, setIsOrderLoading] = useState(!initialOrder?.order_items);
     const reviewSheetRef = useRef(null);
-    const { setIsTabBarVisible } = useTabBarVisibility();
+    const { setIsTabBarVisible } = useAppUI();
+    const { fetchOrderDetails } = useOrders();
     const [rating, setRating] = useState(1);
 
     const reviewSnapPoints = useMemo(() => ['70%'], []);
+
+    useEffect(() => {
+        const getDetails = async () => {
+            if (initialOrder?.id && !initialOrder.order_items) {
+                try {
+                    setIsOrderLoading(true);
+                    const details = await fetchOrderDetails(initialOrder.id);
+                    setOrder(details);
+                } catch (err) {
+                    console.error('Order Details Error:', err);
+                } finally {
+                    setIsOrderLoading(false);
+                }
+            }
+        };
+        getDetails();
+    }, [initialOrder, fetchOrderDetails]);
 
     const handleCopyId = () => {
         Alert.alert('Success', 'Order ID copied to clipboard!');
     };
 
-    const handleSendReview = (reviewData) => {
-        console.log('Review submitted:', reviewData);
-        Alert.alert('Thank you!', 'Your review has been submitted.');
-        reviewSheetRef.current?.close();
+    const handleSendReview = async (reviewData) => {
+        try {
+            await orderService.addReview({
+                product_id: order?.order_items?.[0]?.product_id || order?.product_id,
+                rating: reviewData.rating,
+                review: reviewData.reviewText
+            });
+            Alert.alert('Thank you!', 'Your review has been submitted.');
+            reviewSheetRef.current?.close();
+        } catch (error) {
+            Alert.alert('Error', error.message || 'Failed to submit review');
+        }
     };
 
     const handleShare = () => {
@@ -83,145 +112,137 @@ const OrderDetailScreen = ({ navigation, route }) => {
                 onBackPress={() => navigation.goBack()}
             />
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                {/* Order ID Section */}
-                <View style={styles.section}>
-                    <View style={styles.idRow}>
-                        <Text style={styles.orderIdLabel}>Order ID {order?.id || '000000000000'}</Text>
-                        <TouchableOpacity onPress={handleCopyId}>
-                            <Text style={styles.copyText}>COPY</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <Text style={styles.paymentMode}>Payment Mode <Text style={{ fontWeight: '700', color: '#000' }}>Cash on Delivery</Text></Text>
+            {isOrderLoading ? (
+                <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <ActivityIndicator size="large" color="#637BDD" />
                 </View>
-
-                <View style={styles.divider} />
-
-                {/* Address Section */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Delivery Address</Text>
-                    <Text style={styles.addressName}>Piyush Prajapati</Text>
-                    <Text style={styles.addressText}>
-                        Nathubhai Tower, Front of Honda Showroom, 9th Floor Jivan Jyot, Udhana, Surat, Gujarat 394210
-                    </Text>
-                    <Text style={styles.phoneNumber}>9988556644</Text>
-                </View>
-
-                <View style={styles.divider} />
-
-                {/* Help Centre */}
-                <TouchableOpacity
-                    style={styles.clickableRow}
-                    onPress={() => navigation.navigate('HelpCentre', { order })}
-                >
-                    <Text style={styles.clickableText}>Help Centre</Text>
-                    <Image source={require('../../../assets/icons/Back.png')} style={styles.chevronIcon} />
-                </TouchableOpacity>
-
-                <View style={styles.divider} />
-
-                {/* Product Card */}
-                <View style={styles.productCard}>
-                    <View style={styles.productInfo}>
-                        <Image source={order?.image || require('../../../assets/images/HomeScreenImages/Dress1.png')} style={styles.productImage} />
-                        <View style={styles.productTextContainer}>
-                            <Text style={styles.productTitle}>{order?.title || 'Evening Dress'}</Text>
-                            <Text style={styles.productPrice}>₹{order?.price?.toFixed(2) || '500.00'}</Text>
-                            <Text style={styles.productVariant}>Size: {order?.size || 'XXL'}  Qty: {order?.qty || 1}</Text>
+            ) : (
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                    {/* Order ID Section */}
+                    <View style={styles.section}>
+                        <View style={styles.idRow}>
+                            <Text style={styles.orderIdLabel}>Order ID {order?.id || order?.order_id || '000000000000'}</Text>
+                            <TouchableOpacity onPress={handleCopyId}>
+                                <Text style={styles.copyText}>COPY</Text>
+                            </TouchableOpacity>
                         </View>
+                        <Text style={styles.paymentMode}>Payment Mode <Text style={{ fontWeight: '700', color: '#000' }}>{order?.payment_method || 'Cash on Delivery'}</Text></Text>
+                    </View>
+
+                    <View style={styles.divider} />
+
+                    {/* Address Section */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Delivery Address</Text>
+                        <Text style={styles.addressName}>{order?.user_address?.title || order?.name || 'Customer'}</Text>
+                        <Text style={styles.addressText}>
+                            {order?.user_address?.address || order?.address || 'No address provided'}
+                            {order?.user_address?.apt ? `, ${order.user_address.apt}` : ''}
+                            {order?.user_address?.city ? `\n${order.user_address.city}, ${order.user_address.zipcode}` : ''}
+                        </Text>
+                        <Text style={styles.phoneNumber}>{order?.user_address?.phone || order?.phone || ''}</Text>
+                    </View>
+
+                    <View style={styles.divider} />
+
+                    {/* Help Centre */}
+                    <TouchableOpacity
+                        style={styles.clickableRow}
+                        onPress={() => navigation.navigate('HelpCentre', { order })}
+                    >
+                        <Text style={styles.clickableText}>Help Centre</Text>
                         <Image source={require('../../../assets/icons/Back.png')} style={styles.chevronIcon} />
-                    </View>
+                    </TouchableOpacity>
 
-                    <View style={styles.innerDivider} />
+                    <View style={styles.divider} />
 
-                    {/* Rating Section */}
-                    <View style={styles.ratingSection}>
-                        <Text style={styles.ratingMsg}>We are glad you loved the product</Text>
-                        <View style={styles.starsContainer}>
-                            {[1, 2, 3, 4, 5].map((s) => (
-                                <TouchableOpacity key={s} onPress={() => {
-                                    setRating(s);
-                                    reviewSheetRef.current?.expand();
-                                }}>
-                                    <Image
-                                        source={s === 1 ? require('../../../assets/icons/Star.png') : require('../../../assets/icons/Star1.png')}
-                                        style={styles.starIconLarge}
-                                    />
-                                </TouchableOpacity>
-                            ))}
+                    {/* Product Card */}
+                    {(order?.order_items || [order]).map((item, index) => (
+                        <View key={index.toString()} style={styles.productCard}>
+                            <View style={styles.productInfo}>
+                                <Image source={item.product_thumbnail_image_url ? { uri: item.product_thumbnail_image_url } : (item.image || require('../../../assets/images/HomeScreenImages/Dress1.png'))} style={styles.productImage} />
+                                <View style={styles.productTextContainer}>
+                                    <Text style={styles.productTitle}>{item.product_name || item.title || 'Product'}</Text>
+                                    <Text style={styles.productPrice}>₹{parseFloat(item.product_price || item.price || 0).toFixed(2)}</Text>
+                                    <Text style={styles.productVariant}>Size: {item.size || 'N/A'}  Qty: {item.qty || 1}</Text>
+                                </View>
+                                <Image source={require('../../../assets/icons/Back.png')} style={styles.chevronIcon} />
+                            </View>
+
+                            <View style={styles.innerDivider} />
+
+                            {/* Rating Section */}
+                            <View style={styles.ratingSection}>
+                                <Text style={styles.ratingMsg}>We are glad you loved the product</Text>
+                                <View style={styles.starsContainer}>
+                                    {[1, 2, 3, 4, 5].map((s) => (
+                                        <TouchableOpacity key={s} onPress={() => {
+                                            setRating(s);
+                                            reviewSheetRef.current?.expand();
+                                        }}>
+                                            <Image
+                                                source={rating >= s ? require('../../../assets/icons/Star.png') : require('../../../assets/icons/Star1.png')}
+                                                style={styles.starIconLarge}
+                                            />
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
+                        </View>
+                    ))}
+
+                    <View style={styles.divider} />
+
+                    {/* Order Tracking */}
+                    <View style={styles.productCard}>
+                        <Text style={styles.sectionTitle}>Order Tracking</Text>
+                        <View style={styles.trackingList}>
+                            <TrackingItem status="Order Placed" time={order?.created_at || "N/A"} isCompleted={true} isFirst={true} />
+                            <TrackingItem status="Shipped" time="--" isCompleted={order?.status?.toLowerCase() === 'shipped' || order?.status?.toLowerCase() === 'delivered'} />
+                            <TrackingItem status="Delivered" time="--" isCompleted={order?.status?.toLowerCase() === 'delivered'} isLast={true} />
+                        </View>
+
+                        <View style={styles.buttonRow}>
+                            <TouchableOpacity style={styles.outlineButton} onPress={() => { console.log('Open Tracking Link') }}>
+                                <Image source={require('../../../assets/icons/OpenLink.png')} style={[styles.btnIcon, { width: 20, height: 20 }]} />
+                                <Text style={[styles.outlineButtonText, { marginLeft: 3 }]}>Open Tracking Link</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.outlineButton} onPress={handleShare}>
+                                <Image source={require('../../../assets/icons/share.png')} style={styles.btnIcon} />
+                                <Text style={styles.outlineButtonText}>Share</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
 
-                    {/* Follow Section */}
-                    <View style={styles.followBox}>
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.followText}>Liked the product? Follow and check out more products from this shop</Text>
+                    <View style={styles.divider} />
+
+                    {/* Price Details */}
+                    <View style={styles.section}>
+                        <Text style={styles.priceSectionTitle}>Price Details ({order?.order_items?.length || 1} item)</Text>
+                        <View style={styles.priceRow}>
+                            <Text style={styles.priceLabel}>Total Product Price</Text>
+                            <Text style={styles.priceValue}>₹{parseFloat(order?.sub_total || order?.price || 0).toFixed(2)}</Text>
                         </View>
-                        <TouchableOpacity>
-                            <Text style={styles.followButton}>FOLLOW</Text>
-                        </TouchableOpacity>
+                        <View style={styles.priceRow}>
+                            <Text style={styles.priceLabel}>Shipping</Text>
+                            <Text style={styles.priceValue}>₹{parseFloat(order?.shipping_charges || 0).toFixed(2)}</Text>
+                        </View>
+                        <View style={styles.priceRow}>
+                            <Text style={styles.priceLabel}>GST/Tax</Text>
+                            <Text style={styles.priceValue}>₹{parseFloat(order?.tax || 0).toFixed(2)}</Text>
+                        </View>
+                        <View style={styles.priceRow}>
+                            <Text style={styles.priceLabel}>Coupon Discount</Text>
+                            <Text style={[styles.priceValue, { color: '#10B981' }]}>- ₹{parseFloat(order?.coupon_discount || 0).toFixed(2)}</Text>
+                        </View>
+                        <View style={[styles.innerDivider, { marginVertical: 10 }]} />
+                        <View style={styles.priceRow}>
+                            <Text style={styles.totalLabel}>Order Total</Text>
+                            <Text style={styles.totalValue}>₹{parseFloat(order?.grand_total || order?.total || 0).toFixed(2)}</Text>
+                        </View>
                     </View>
-                </View>
-
-                <View style={styles.divider} />
-
-                {/* Order Tracking */}
-                <View style={styles.productCard}>
-                    <Text style={styles.sectionTitle}>Order Tracking</Text>
-                    <View style={styles.trackingList}>
-                        <TrackingItem status="Order Placed" time="07:28 PM, 03 July, 2023" isCompleted={true} isFirst={true} />
-                        <TrackingItem status="Shipped" time="07:28 PM, 03 July, 2023" isCompleted={false} />
-                        <TrackingItem status="Delivered" time="07:28 PM, 03 July, 2023" isCompleted={false} isLast={true} />
-                    </View>
-
-                    <View style={styles.buttonRow}>
-                        <TouchableOpacity style={styles.outlineButton} onPress={() => { console.log('Open Tracking Link') }}>
-                            <Image source={require('../../../assets/icons/OpenLink.png')} style={[styles.btnIcon, { width: 20, height: 20 }]} />
-                            <Text style={[styles.outlineButtonText, { marginLeft: 3 }]}>Open Tracking Link</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.outlineButton} onPress={handleShare}>
-                            <Image source={require('../../../assets/icons/share.png')} style={styles.btnIcon} />
-                            <Text style={styles.outlineButtonText}>Share</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-                <View style={styles.divider} />
-
-                {/* Download Invoice */}
-                <TouchableOpacity style={styles.clickableRow}>
-                    <Text style={styles.clickableText}>Download Invoice</Text>
-                    <Image source={require('../../../assets/icons/Back.png')} style={styles.chevronIcon} />
-                </TouchableOpacity>
-
-                <View style={styles.divider} />
-
-                {/* Price Details */}
-                <View style={styles.section}>
-                    <Text style={styles.priceSectionTitle}>Price Details (1 item)</Text>
-                    <View style={styles.priceRow}>
-                        <Text style={styles.priceLabel}>Total Product Price</Text>
-                        <Text style={styles.priceValue}>₹500.00</Text>
-                    </View>
-                    <View style={styles.priceRow}>
-                        <Text style={styles.priceLabel}>Shipping</Text>
-                        <Text style={styles.priceValue}>₹100.00</Text>
-                    </View>
-                    <View style={styles.priceRow}>
-                        <Text style={styles.priceLabel}>GST 28%</Text>
-                        <Text style={styles.priceValue}>₹0.00</Text>
-                    </View>
-                    <View style={styles.priceRow}>
-                        <Text style={styles.priceLabel}>Coupon Discount</Text>
-                        <Text style={styles.priceValue}>₹0.00</Text>
-                    </View>
-                    <View style={[styles.innerDivider, { marginVertical: 10 }]} />
-                    <View style={styles.priceRow}>
-                        <Text style={styles.totalLabel}>Order Total</Text>
-                        <Text style={styles.totalValue}>₹600.00</Text>
-                    </View>
-                </View>
-            </ScrollView>
+                </ScrollView>
+            )}
 
             <RateReviewSheet
                 bottomSheetRef={reviewSheetRef}

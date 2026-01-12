@@ -11,10 +11,10 @@ import {
   FlatList,
 } from 'react-native';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
-import { CommonHeader } from '../../../components/CommonHeader';
-import { ordersData, filterOptions } from '../../../data/ordersData';
-import { useCart } from '../../../contexts/CartContext';
-import PromoBanner from '../../../CommonHelper/PromoBanner';
+import { CommonHeader } from '../../../components/layout/CommonHeader';
+import { useCart, useOrders } from '../../../hooks';
+import PromoBanner from '../../../components/features/home/PromoBanner';
+import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -22,11 +22,18 @@ const OrderScreen = ({ navigation }) => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const { cartItems } = useCart();
+  const { orders, isLoading, fetchOrders } = useOrders();
 
-  const filteredOrders = ordersData.filter(order => {
-    const matchesFilter = activeFilter === 'All' || order.status === activeFilter;
+  const filterOptions = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  const filteredOrders = orders.filter(order => {
+    const matchesFilter = activeFilter === 'All' || order.status.toLowerCase() === activeFilter.toLowerCase();
     const matchesSearch = order.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.id.includes(searchQuery);
+      order.id.toString().includes(searchQuery);
     return matchesFilter && matchesSearch;
   });
 
@@ -119,19 +126,33 @@ const OrderScreen = ({ navigation }) => {
         cartBadgeCount={cartItems?.length || 0}
       />
 
-      <FlatList
-        data={filteredOrders}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <OrderCard item={item} />}
-        ListHeaderComponent={renderHeader}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No orders found</Text>
-          </View>
-        }
-      />
+      {isLoading && orders.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#637BDD" />
+          <Text style={styles.loadingText}>Fetching your orders...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredOrders}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <OrderCard item={item} />}
+          ListHeaderComponent={renderHeader}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          refreshing={isLoading}
+          onRefresh={fetchOrders}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Image
+                source={require('../../../assets/icons/Bag1.png')}
+                style={styles.emptyIcon}
+              />
+              <Text style={styles.emptyTitle}>No orders yet</Text>
+              <Text style={styles.emptyText}>When you place an order, it will appear here.</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 };
@@ -293,14 +314,39 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '180deg' }], // Using back arrow as forward chevron
     opacity: 0.8,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#6B7280',
+    fontSize: 16,
+  },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+  emptyIcon: {
+    width: 60,
+    height: 60,
+    tintColor: '#E5E7EB',
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 8,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#9CA3AF',
-    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 20,
   }
 });

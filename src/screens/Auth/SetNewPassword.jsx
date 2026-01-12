@@ -17,10 +17,16 @@ import {
     responsiveWidth,
     responsiveHeight,
 } from "react-native-responsive-dimensions";
-import GoogleAndFacebookButtonList from "../../Buttons/CustomSocialButton";
-import HeaderTextBlock from "../../CommonHelper/HeaderTextBlock";
+// import GoogleAndFacebookButtonList from "../../components/common/CustomSocialButton";
+import HeaderTextBlock from "../../components/common/HeaderTextBlock";
 const SetNewPassword = ({ navigation }) => {
 
+    const handleSavePassword = () => {
+        if (!email.trim() || !password.trim()) {
+            alert("Please enter email and password");
+            return;
+        }
+    }
     return (
         <View style={styles.container}>
             <ImageBackground
@@ -73,7 +79,7 @@ const SetNewPassword = ({ navigation }) => {
                                 placeholder="Enter New Password"
                                 placeholderTextColor="rgba(255,255,255,0.7)"
                                 style={styles.SignInInputFields}
-                                keyboardType="email-address"
+                                keyboardType="visible-password"
                             />
                         </View>
                         {/* Email Field */}
@@ -86,14 +92,14 @@ const SetNewPassword = ({ navigation }) => {
                                 placeholder="Confirm Password"
                                 placeholderTextColor="rgba(255,255,255,0.7)"
                                 style={styles.SignInInputFields}
-                                keyboardType="email-address"
+                                keyboardType="visible-password"
                             />
                         </View>
                     </View>
 
                     {/* Buttons */}
                     <View style={styles.buttonContainer}>
-                        <GoogleAndFacebookButtonList
+                        {/* <GoogleAndFacebookButtonList
                             width={responsiveWidth(70)}
                             height={responsiveHeight(6.5)}
                             backgroundColor="#637BDD"
@@ -101,7 +107,7 @@ const SetNewPassword = ({ navigation }) => {
                             textColor="#FFF"
                             onPress={() => navigation.navigate('PassSaveSuccessScreen')}
                             style={styles.SendBtn}
-                        />
+                        /> */}
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

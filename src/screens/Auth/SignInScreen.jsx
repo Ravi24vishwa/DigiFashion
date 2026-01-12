@@ -19,8 +19,8 @@ import {
     responsiveWidth,
     responsiveHeight,
 } from "react-native-responsive-dimensions";
-import SignUpButton from "../../Buttons/SignUpButton";
-import HeaderTextBlock from "../../CommonHelper/HeaderTextBlock";
+import SignUpButton from "../../components/common/SignUpButton";
+import HeaderTextBlock from "../../components/common/HeaderTextBlock";
 // const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Custom Checkbox Component
@@ -218,7 +218,7 @@ const SignInScreen = ({ navigation }) => {
                                 Don't have an account?{" "}
                             </Text>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate("SignUpScreen")}
+                                onPress={() => navigation.goBack()}
                             >
                                 <Text style={styles.linkBold}>
                                     Create Account

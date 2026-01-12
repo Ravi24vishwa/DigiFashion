@@ -14,7 +14,7 @@
 ### Base Configuration
 ```
 Development URL: http://192.168.0.108:2205/api/
-Production URL: https://ike.sevenoceansholiday.com/
+Production URL: https://project.spanchemicalsindia.com/digi/api/
 ```
 
 ### Required Tools

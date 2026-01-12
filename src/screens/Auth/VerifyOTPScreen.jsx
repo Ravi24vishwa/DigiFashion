@@ -5,9 +5,9 @@ import {
   responsiveWidth,
   responsiveHeight,
 } from "react-native-responsive-dimensions";
-import GoogleAndFacebookButtonList from '../../Buttons/CustomSocialButton'
-import OtpInput from '../../CommonHelper/OTPInput'
-import HeaderTextBlock from '../../CommonHelper/HeaderTextBlock';
+// import GoogleAndFacebookButtonList from '../../components/common/CustomSocialButton'
+import OtpInput from '../../components/common/OTPInput'
+import HeaderTextBlock from '../../components/common/HeaderTextBlock';
 import { useDispatch, useSelector } from 'react-redux';
 import { verifyOtp } from '../../store/slices/authSlice';
 
@@ -78,7 +78,7 @@ const VerifyOTPScreen = ({ navigation, route }) => {
 
           {/* verify button */}
           <View style={{ alignSelf: 'center' }}>
-            <GoogleAndFacebookButtonList
+            {/* <GoogleAndFacebookButtonList
               width={responsiveWidth(60)}
               height={responsiveHeight(6.5)}
               backgroundColor="#637BDD"
@@ -86,7 +86,7 @@ const VerifyOTPScreen = ({ navigation, route }) => {
               textColor="#FFF"
               onPress={handleVerify}
               style={styles.verfyBtn}
-            />
+            /> */}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

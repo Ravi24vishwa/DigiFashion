@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, Image, Dimen
 import React from 'react'
 import { RFValue } from "react-native-responsive-fontsize";
 import { responsiveWidth, responsiveHeight } from "react-native-responsive-dimensions";
-import HeaderTextBlock from '../../CommonHelper/HeaderTextBlock'
+import HeaderTextBlock from '../../components/common/HeaderTextBlock'
 const { width, height } = Dimensions.get('screen');
 
 const IntroScreen = ({ navigation }) => {

@@ -22,7 +22,7 @@ import { setTabBarVisible } from '../store/slices/uiSlice';
 export const useAppCart = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items, shallowEqual);
-
+  console.log("use app data")
   const handleAddToCart = useCallback((product) => dispatch(addToCart(product)), [dispatch]);
   const handleRemoveFromCart = useCallback((productId) => dispatch(removeFromCart(productId)), [dispatch]);
   const handleUpdateQuantity = useCallback((productId, type) =>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "612975934664",
+    "project_id": "digifashion-9b0eb",
+    "storage_bucket": "digifashion-9b0eb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:612975934664:android:7b38798de217df14a8f9fd",
+        "android_client_info": {
+          "package_name": "com.digifashion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "612975934664-agpmvj7u3hgdpbd9r97gt4o31h7o0q1u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIwlRmh_oyhiNeL_La6vUZLCY5KYXdCUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "612975934664-agpmvj7u3hgdpbd9r97gt4o31h7o0q1u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

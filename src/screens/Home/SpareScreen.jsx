@@ -6,7 +6,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-import SearchBar from "../../components/SearchBar";
+import SearchBar from "../../components/common/SearchBar";
 
 export const PRODUCTS = [
   {

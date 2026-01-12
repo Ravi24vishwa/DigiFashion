@@ -11,10 +11,10 @@ import {
 } from 'react-native';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { useRoute } from '@react-navigation/native';
-import ProductGrid from '../../CommonHelper/ProductGrid';
-import { useFavorites } from '../../contexts/FavoritesContext';
-// import  CustomProductList  from '../../CommonHelper/CustomProductList';
-// import {saleItems, TopItems, newItems} from '../../data/productdata'
+import ProductGrid from '../../components/features/products/ProductGrid';
+import { useFavorites } from '../../hooks';
+// import  CustomProductList  from '../../components/features/products/CustomProductList';
+import { saleItems } from '../../constants/data/productdata'
 
 const ViewAllScreen = ({ navigation }) => {
 
@@ -22,16 +22,21 @@ const ViewAllScreen = ({ navigation }) => {
 
   const seasonalProductList = routes.params
 
-  console.log(seasonalProductList);
+  console.log("-----------> data", seasonalProductList);
 
+  const [ProductData, setProductData] = useState(seasonalProductList.id)
+  const { toggleFavorite, isFavorite, removeFavoriteLocally } = useFavorites();
 
-  const [ProductData, setProductData] = useState(seasonalProductList)
-  const { toggleFavorite, isFavorite } = useFavorites();
-
-  const handleFavoritePress = (item) => {
-    toggleFavorite(item.id !== undefined ? item.id : item);
+  const handleFavoritePress = (item, isLongPress = false) => {
+    const productId = item.id !== undefined ? item.id : item;
+    if (isLongPress) {
+      removeFavoriteLocally(productId);
+    } else {
+      toggleFavorite(productId);
+    }
   };
 
+  console.log("-----------> product data", ProductData);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFF' }}>
@@ -44,8 +49,8 @@ const ViewAllScreen = ({ navigation }) => {
         paddingTop: 40,
         paddingBottom: 10
       }}>
-        <Text style={{ fontSize: 44 }}>
-          Digi<Text style={{ fontWeight: 'bold' }}>FASHION</Text>
+        <Text style={{ fontSize: 34, fontWeight: '700' }}>
+          {seasonalProductList.title}
         </Text>
         <TouchableOpacity style={{
           width: 48,
@@ -86,10 +91,15 @@ const ViewAllScreen = ({ navigation }) => {
         </TouchableOpacity>
       </ScrollView>
       <ProductGrid
-        products={ProductData.map(item => ({
-          ...item,
-          isFavorite: isFavorite(item.id)
-        }))}
+        products={(ProductData?.map(p => ({
+          ...p,
+          title: p.name || p.title || p.product_name,
+          price: parseFloat(p.product_price || 0),
+          oldPrice: parseFloat(p.product_mrp || 0),
+          imageUrl: p.product_thumbnail_image_url,
+          id: p.id || p.product_id,
+          discount: p.product_discount
+        })))}
         horizontal={false}
         numColumns={2}
         cardWidth={"47%"}
@@ -98,7 +108,8 @@ const ViewAllScreen = ({ navigation }) => {
         showDiscount
         showFavorite
         onProductPress={(item) => navigation.navigate('ProductDetailScreen', item)}
-        onFavoritePress={handleFavoritePress}
+        onFavoritePress={(item) => handleFavoritePress(item, false)}
+        onFavoriteLongPress={(item) => handleFavoritePress(item, true)}
       />
     </View>
   )
