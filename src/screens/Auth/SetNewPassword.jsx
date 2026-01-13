@@ -17,7 +17,7 @@ import {
     responsiveWidth,
     responsiveHeight,
 } from "react-native-responsive-dimensions";
-// import GoogleAndFacebookButtonList from "../../components/common/CustomSocialButton";
+import SignUpButton from '../../components/common/SignUpButton';
 import HeaderTextBlock from "../../components/common/HeaderTextBlock";
 const SetNewPassword = ({ navigation }) => {
 
@@ -99,15 +99,12 @@ const SetNewPassword = ({ navigation }) => {
 
                     {/* Buttons */}
                     <View style={styles.buttonContainer}>
-                        {/* <GoogleAndFacebookButtonList
-                            width={responsiveWidth(70)}
-                            height={responsiveHeight(6.5)}
-                            backgroundColor="#637BDD"
-                            title="Save Password"
-                            textColor="#FFF"
-                            onPress={() => navigation.navigate('PassSaveSuccessScreen')}
-                            style={styles.SendBtn}
-                        /> */}
+                       
+                         <SignUpButton
+                            title={'Save'}
+                            onPress={() => navigation.popToTop('')}
+                            // onPress={handleSendOtp}
+                        />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

@@ -14,7 +14,6 @@ import {
 import React, { useState } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
 import { responsiveWidth, responsiveHeight } from "react-native-responsive-dimensions";
-// import GoogleAndFacebookButtonList from "../../components/common/CustomSocialButton";
 import HeaderTextBlock from "../../components/common/HeaderTextBlock";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyOtp } from '../../store/slices/authSlice';

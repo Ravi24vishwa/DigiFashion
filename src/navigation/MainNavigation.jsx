@@ -65,11 +65,11 @@ const MainNavigation = () => {
     <NavigationContainer
       ref={navigationRef}
       onReady={() => {
-        console.log("######################## ***** ## i am onready")
+        // console.log("######################## ***** ## i am onready")
         routeNameRef.current = navigationRef.getCurrentRoute()?.name;
       }}
       onStateChange={async () => {
-        console.log("######################## ***** ## i am onstatechange")
+        // console.log("######################## ***** ## i am onstatechange")
         const previousRouteName = routeNameRef.current;
         const currentRoute = navigationRef.getCurrentRoute();
         const currentRouteName = currentRoute?.name;

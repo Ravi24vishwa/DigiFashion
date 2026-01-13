@@ -17,8 +17,8 @@ import {
     responsiveWidth,
     responsiveHeight,
 } from "react-native-responsive-dimensions";
-// import GoogleAndFacebookButtonList from "../../components/common/CustomSocialButton";
 import HeaderTextBlock from "../../components/common/HeaderTextBlock";
+import SignUpButton from '../../components/common/SignUpButton';
 
 
 const ForgotPassScreen = ({ navigation }) => {
@@ -93,16 +93,10 @@ const ForgotPassScreen = ({ navigation }) => {
 
                     {/* Buttons */}
                     <View style={styles.buttonContainer}>
-                        {/* <GoogleAndFacebookButtonList
-                            width={responsiveWidth(70)}
-                            height={responsiveHeight(6.5)}
-                            backgroundColor="#637BDD"
-                            title="Send"
-                            textColor="#FFF"
+                      <SignUpButton
+                            title={'Sign Up'}
                             onPress={HandleNewPassword}
-                            // onPress={() => console.log('navigate to new password screen if possible')}
-                            style={styles.SendBtn}
-                        /> */}
+                        />
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

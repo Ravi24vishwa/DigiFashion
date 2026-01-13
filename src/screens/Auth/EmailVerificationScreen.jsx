@@ -24,7 +24,6 @@ import { responsiveWidth, responsiveHeight } from "react-native-responsive-dimen
 import Toast from 'react-native-toast-message';
 
 //helping components
-// import GoogleAndFacebookButtonList from "../../components/common/CustomSocialButton";
 import HeaderTextBlock from "../../components/common/HeaderTextBlock";
 import { googleLogin, sendOtp } from "../../store/slices/authSlice";
 import SignUpButton from '../../components/common/SignUpButton';
@@ -228,16 +227,6 @@ const EmailVerificationScreen = ({ navigation }) => {
                             imageSource={require('../../assets/icons/google.png')}
                         />
                     </View>
-                    <GoogleAndFacebookButtonList
-                        width={responsiveWidth(70)}
-                        height={responsiveHeight(6.5)}
-                        backgroundColor="white"
-                        title={localLoading ? "Logging in..." : "Log in with Google"}
-                        textColor="#000"
-                        icon={require('../../assets/icons/google.png')}
-                        onPress={handleGoogleLogin}
-                        style={[styles.googleBtn, { alignSelf: 'center' }]} // keeps your variable name exactly same
-                    />
                     <View style={styles.LoginTextContainer}>
                         <Text style={styles.LogInText}>Already Have account?
                             <TouchableOpacity onPress={() => navigation.navigate('SignInScreen')}>

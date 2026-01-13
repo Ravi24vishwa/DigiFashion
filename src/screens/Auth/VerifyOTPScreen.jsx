@@ -5,11 +5,11 @@ import {
   responsiveWidth,
   responsiveHeight,
 } from "react-native-responsive-dimensions";
-// import GoogleAndFacebookButtonList from '../../components/common/CustomSocialButton'
 import OtpInput from '../../components/common/OTPInput'
 import HeaderTextBlock from '../../components/common/HeaderTextBlock';
 import { useDispatch, useSelector } from 'react-redux';
 import { verifyOtp } from '../../store/slices/authSlice';
+import SignUpButton from '../../components/common/SignUpButton';
 
 const VerifyOTPScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -78,15 +78,11 @@ const VerifyOTPScreen = ({ navigation, route }) => {
 
           {/* verify button */}
           <View style={{ alignSelf: 'center' }}>
-            {/* <GoogleAndFacebookButtonList
-              width={responsiveWidth(60)}
-              height={responsiveHeight(6.5)}
-              backgroundColor="#637BDD"
-              title="Verify "
-              textColor="#FFF"
+            <SignUpButton
+              title={isLoading ? "Verifying..." : "Verify"}
               onPress={handleVerify}
               style={styles.verfyBtn}
-            /> */}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

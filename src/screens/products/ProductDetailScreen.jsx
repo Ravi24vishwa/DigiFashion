@@ -24,6 +24,7 @@ export default function ProductDetailScreen({ navigation, route }) {
   const { slug } = route.params || {};
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const cart = useCart();
   const addToCart = cart?.addToCart || (() => console.warn("Cart context missing"));
@@ -100,23 +101,11 @@ export default function ProductDetailScreen({ navigation, route }) {
     }
   }, [slug]);
 
-  // useEffect(() => {
-  //   // Mark as viewed when screen opens
-  //   if (product?.id) {
-  //     // Local persistence logic if needed
-  //     // Mark as viewed when screen opens (sync work)
-  //     if (item?.id) {
-  //       item.IsViewed = true;
-  //       const sourceItem = ProductData.find(p => p.id === item.id);
-  //       if (sourceItem) {
-  //         sourceItem.IsViewed = true;
-  //       }
-  //     }
-  //   }, [product]);
   useEffect(() => {
     if (!product?.id) return;
     // Optional: persist viewed status locally or via API
     console.log(`Product ${product.id} viewed`);
+    console.log(`####################Product ${product} #`);
   }, [product]);
 
 
@@ -131,28 +120,28 @@ export default function ProductDetailScreen({ navigation, route }) {
   const handleFavoritePress = useCallback((product) => {
     const target = product || saleProduct;
     const productId = target?.id !== undefined ? target.id : target;
-    console.log('Toggling favorite for product:', productId, target?.title, isLongPress ? '(Force Local Removal)' : '');
+    console.log('Toggling favorite for product:', productId, target?.title ? '(Force Local Removal)' : '');
 
-    if (isLongPress) {
-      removeFavoriteLocally(productId);
-    } else {
-      toggleFavorite(productId);
-    }
+    // if (isLongPress) {
+    //   removeFavoriteLocally(productId);
+    // } else {
+    //   toggleFavorite(productId);
+    // }
   });
 
-  const handleSharePress = useCallback(() => {
-    if (item?.id) {
-      item.IsShared = true;
-      const sourceItem = ProductData.find(p => p.id === item.id);
-      if (sourceItem) {
-        sourceItem.IsShared = true;
-      }
-      Alert.alert('Shared', 'Product shared and added to Shared tab!', [
-        { text: 'View', onPress: () => navigation.navigate('MyProduct', { tab: 'Shared' }) },
-        { text: 'OK' }
-      ]);
-    }
-  }, [item]);
+  // const handleSharePress = useCallback(() => {
+  //   if (item?.id) {
+  //     item.IsShared = true;
+  //     const sourceItem = ProductData.find(p => p.id === item.id);
+  //     if (sourceItem) {
+  //       sourceItem.IsShared = true;
+  //     }
+  //     Alert.alert('Shared', 'Product shared and added to Shared tab!', [
+  //       { text: 'View', onPress: () => navigation.navigate('MyProduct', { tab: 'Shared' }) },
+  //       { text: 'OK' }
+  //     ]);
+  //   }
+  // }, [item]);
 
   // Product Options Sheet (Color & Size)
   const [selectedSize, setSelectedSize] = useState('L');
@@ -267,7 +256,7 @@ export default function ProductDetailScreen({ navigation, route }) {
         // showShare={true}
         onBackPress={() => navigation.goBack()}
         onWishlistPress={() => handleFavoritePress(saleProduct)}
-        onSharePress={handleSharePress}
+        // onSharePress={handleSharePress}
         cartBadgeCount={cart?.cartItems?.length || 0}
       />
       <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
@@ -311,7 +300,7 @@ export default function ProductDetailScreen({ navigation, route }) {
           <ProductInfo
             item={saleProduct}
             onPress={handleFavoritePress}
-            onShare={handleSharePress}
+            // onShare={handleSharePress}
           />
           <View style={styles.divider} />
           <SizeSelector
@@ -358,7 +347,7 @@ export default function ProductDetailScreen({ navigation, route }) {
                 showFavorite
                 onProductPress={(item) => navigation.push('ProductDetailScreen', { slug: item.id || item.product_id })}
                 onFavoritePress={(item) => handleFavoritePress(item, false)}
-                onFavoriteLongPress={(item) => handleFavoritePress(item, true)}
+                // onFavoriteLongPress={(item) => handleFavoritePress(item, true)}
                 contentContainerStyle={{ paddingHorizontal: 0, paddingBottom: 20 }}
               />
             </View>
