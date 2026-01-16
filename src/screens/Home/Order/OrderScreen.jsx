@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ const OrderScreen = ({ navigation }) => {
   const { cartItems } = useCart();
   const { orders, isLoading, fetchOrders } = useOrders();
 
-  const filterOptions = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+  const filterOptions = ['All', 'Ordered', 'Shipped',  'Delivered',  'Cancelled', 'Exchange',  'Return', ];
 
   useEffect(() => {
     fetchOrders();
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontSize: 20,
-    color: '#637BDD',
+    color: '#5F5F5F',
     fontWeight: '500',
   },
   activeFilterText: {
