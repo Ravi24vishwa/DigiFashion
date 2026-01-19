@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Text, View, Dimensions, KeyboardAvoidingView, ScrollView } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View, Dimensions, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
 import React, { useState } from 'react'
 import { RFValue } from "react-native-responsive-fontsize";
 import {

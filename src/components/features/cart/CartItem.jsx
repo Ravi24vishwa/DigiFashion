@@ -34,13 +34,13 @@ const CartItem = ({ item, updateQuantity, onOpenSizeModal, onRemove }) => (
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={styles.sizeDropdown}
                         onPress={() => onOpenSizeModal(item)}
                     >
                         <Text style={styles.sizeDropdownText}>{item.size || 'L'}</Text>
                         <Image source={require('./../../../assets/icons/DownArrow1.png')} style={styles.dropdownArrow} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
 
                 <Text style={styles.deliveryEstimate}>Delivery by Thu Jun 23</Text>

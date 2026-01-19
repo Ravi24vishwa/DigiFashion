@@ -18,8 +18,8 @@ const PassSaveSuccessScreen = ({ navigation }) => {
         <Text style={{ textAlign: 'center', fontSize: 18, marginBottom: responsiveHeight(6) }}>Your password has been changed {"\n"}  successfully.</Text>
         <View style={{ marginTop: responsiveHeight(6.5) }}>
            <SignUpButton
-                title={'Sign Up'}
-                onPress={handleSendOtp}
+                title={'Sign In'}
+                onPress={() => navigation.navigate('SignIn')}
             />
         </View>
       </View>

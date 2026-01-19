@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { productService } from '../../api/productService';
 import { ActivityIndicator } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 const SearchBarScreen = () => {
   const navigation = useNavigation();
@@ -33,7 +34,12 @@ const SearchBarScreen = () => {
         }));
         setResults(mappedData);
       } catch (error) {
-        console.error('Search error:', error);
+        // console.error('Search error:', error);
+        Toast.show({
+          type: 'info',
+          text1: 'INFO',
+          text2: `${error.message}`
+        });
         setResults([]);
       } finally {
         setIsLoading(false);

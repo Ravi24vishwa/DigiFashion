@@ -32,7 +32,7 @@ const CustomProductList = {
           backgroundColor: '#FFF',
           borderRadius: borderRadius,
           marginRight: 12,
-          marginBottom: 5,
+          marginBottom: 12,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,

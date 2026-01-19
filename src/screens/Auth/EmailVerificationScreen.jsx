@@ -326,12 +326,6 @@ const styles = StyleSheet.create({
         marginTop: responsiveHeight(1),
         marginLeft: responsiveWidth(2),
     },
-    errorText: {
-        color: '#c91717ff',
-        fontSize: RFValue(12),
-        marginTop: responsiveHeight(1),
-        marginLeft: responsiveWidth(2),
-    },
 
     sendButton: {
         marginBottom: "2%",

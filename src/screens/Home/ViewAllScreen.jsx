@@ -27,11 +27,11 @@ const ViewAllScreen = ({ navigation }) => {
   const [ProductData, setProductData] = useState(seasonalProductList.id)
   const { toggleFavorite, isFavorite, removeFavoriteLocally } = useFavorites();
 
-  const handleFavoritePress = (item, isLongPress = false) => {
-    const productId = item.id !== undefined ? item.id : item;
+  const handleFavoritePress = (productId, isLongPress = false) => {
+    console.log("-----------> favorite pressed", productId)
     if (isLongPress) {
       removeFavoriteLocally(productId);
-    } else {
+    } else {  
       toggleFavorite(productId);
     }
   };
@@ -107,9 +107,8 @@ const ViewAllScreen = ({ navigation }) => {
         showOldPrice
         showDiscount
         showFavorite
-        onProductPress={(item) => navigation.navigate('ProductDetailScreen', item)}
-        onFavoritePress={(item) => handleFavoritePress(item, false)}
-        onFavoriteLongPress={(item) => handleFavoritePress(item, true)}
+        onProductPress={(item) => navigation.navigate('ProductDetailScreen', { slug: item.product_slug || item.id })}
+        onFavoritePress={(item) => handleFavoritePress(item.id, false)}
       />
     </View>
   )

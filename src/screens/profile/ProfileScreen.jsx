@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '180deg' }],
     opacity: 0.8,
   },
-  divider: {
+  sectionDivider: {
     height: 8,
     backgroundColor: '#F9FAFB',
     borderTopWidth: 1,

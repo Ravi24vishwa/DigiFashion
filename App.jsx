@@ -1,6 +1,6 @@
 
 // App.js
-import { StyleSheet, View, StatusBar, Text } from 'react-native';
+import { StatusBar, Text } from 'react-native';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import MainNavigation from './src/navigation/MainNavigation';

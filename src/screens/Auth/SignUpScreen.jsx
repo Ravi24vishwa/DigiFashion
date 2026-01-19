@@ -44,7 +44,7 @@ const SignUpScreen = ({ navigation, route }) => {
     }, [receivedOtp]);
 
     const handleSignUp = async () => {
-        data = {
+        const data = {
             name1: name,
             email1: email,
             password1: password,

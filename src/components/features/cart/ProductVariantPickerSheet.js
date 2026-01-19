@@ -1,168 +1,247 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 
 export const ProductVariantPickerSheet = ({
-    bottomSheetRef,
-    snapPoints = ['65%'],
-    product,
-    onAddToCart,
-    onClose,
-    setIsTabBarVisible,
-    onColorSizeChange
+  bottomSheetRef,
+  snapPoints = ['65%'],
+  product,
+  onClose,
+  setIsTabBarVisible,
+  onColorSizeChange,
 }) => {
-    const [selectedSize, setSelectedSize] = useState('');
-    const [selectedColor, setSelectedColor] = useState('');
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
 
-    useEffect(() => {
-        if (product) {
-            if (product.size && product.size.length > 0) {
-                setSelectedSize(product.size[0]);
-            }
-            if (product.color && product.color.length > 0) {
-                setSelectedColor(product.color[0]?.label || product.color[0]);
-            }
-        }
-    }, [product]);
+  /* =======================
+     🔧 API NORMALIZATION
+     (NO UI CHANGE)
+  ======================== */
 
-    const sizes = product?.size || ['S', 'M', 'L', 'XL'];
-    const colors = product?.color || [
-        { label: 'Default', colorCode: '#4F46E5' },
-    ];
+  const sizes = useMemo(() => {
+    if (product?.size_variants?.length > 0) {
+      return product.size_variants.map(s => s.name || s);
+    }
+    if (product?.product_additional_details?.Size) {
+      return [product.product_additional_details.Size];
+    }
+    return [];
+  }, [product]);
 
-    const renderBackdrop = useCallback(
-        (props) => (
-            <BottomSheetBackdrop
-                {...props}
-                disappearsOnIndex={-1}
-                appearsOnIndex={0}
-                opacity={0.5}
+  const colors = useMemo(() => {
+    if (product?.color_variants?.length > 0) {
+      return product.color_variants.map(c => ({
+        label: c.name,
+        colorCode: c.code || '#4F46E5',
+      }));
+    }
+    if (product?.product_additional_details?.Color) {
+      return [{
+        label: product.product_additional_details.Color,
+        colorCode: '#4F46E5',
+      }];
+    }
+    return [];
+  }, [product]);
+
+  /* =======================
+     DEFAULT SELECTIONS
+  ======================== */
+
+  useEffect(() => {
+    if (!product) return;
+
+    if (sizes.length > 0) setSelectedSize(sizes[0]);
+    if (colors.length > 0) setSelectedColor(colors[0].label);
+
+    // console.log('ProductVariantPickerSheet - normalized:', {
+    //   sizes,
+    //   colors,
+    // });
+  }, [product, sizes, colors]);
+
+  /* =======================
+     BOTTOM SHEET HANDLERS
+  ======================== */
+
+  const renderBackdrop = useCallback(
+    props => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.5}
+      />
+    ),
+    []
+  );
+
+  const handleSheetChanges = useCallback(
+    index => {
+      if (index === -1) {
+        setIsTabBarVisible?.(true);
+        onClose?.();
+      }
+    },
+    [setIsTabBarVisible, onClose]
+  );
+
+  const handleApply = () => {
+    onColorSizeChange?.({
+      color: selectedColor,
+      size: selectedSize,
+    });
+
+    // onAddToCart?.({
+    //   ...product, // UI expects this
+    //   selected_color_name: selectedColor,
+    //   selected_size_name: selectedSize,
+    // });
+
+    bottomSheetRef.current?.close();
+  };
+
+  /* =======================
+     UI (UNCHANGED)
+  ======================== */
+
+  return (
+    <BottomSheet
+      ref={bottomSheetRef}
+      index={-1}
+      snapPoints={snapPoints}
+      enablePanDownToClose
+      backdropComponent={renderBackdrop}
+      backgroundStyle={styles.bottomSheetBackground}
+      handleIndicatorStyle={styles.handleIndicator}
+      onChange={handleSheetChanges}
+    >
+      <BottomSheetView style={styles.contentContainer}>
+        {/* Product Summary */}
+        <View style={styles.productSummary}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={
+                product?.image
+                  ? typeof product.image === 'string'
+                    ? { uri: product.image }
+                    : product.image
+                  : require('../../../assets/icons/Show.png')
+              }
+              style={styles.productImage}
             />
-        ),
-        []
-    );
+          </View>
+          <View style={styles.productInfo}>
+            <Text style={styles.productName} numberOfLines={2}>
+              {product?.title || product?.product_name || 'Product Details'}
+            </Text>
+            <Text style={styles.productPrice}>
+              ₹{product?.price || product?.product_price || '0.00'}
+            </Text>
+          </View>
+        </View>
 
-    const handleSheetChanges = useCallback((index) => {
-        if (index === -1) {
-            if (setIsTabBarVisible) setIsTabBarVisible(true);
-            if (onClose) onClose();
-        }
-    }, [setIsTabBarVisible, onClose]);
+        <View style={styles.divider} />
 
-    const handleApply = () => {
-        if (onColorSizeChange) {
-            onColorSizeChange({ color: selectedColor, size: selectedSize });
-        }
+        {/* Color Selector */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Select Color:{' '}
+            <Text style={styles.selectedOption}>{selectedColor}</Text>
+          </Text>
 
-        if (onAddToCart) {
-            onAddToCart({ ...product, size: selectedSize, color: selectedColor });
-        }
-        bottomSheetRef.current?.close();
-    };
+          <View style={styles.optionsRow}>
+            {colors.map((color, index) => {
+              const label = color.label;
+              const code = color.colorCode;
 
-    return (
-        <BottomSheet
-            ref={bottomSheetRef}
-            index={-1}
-            snapPoints={snapPoints}
-            enablePanDownToClose
-            backdropComponent={renderBackdrop}
-            backgroundStyle={styles.bottomSheetBackground}
-            handleIndicatorStyle={styles.handleIndicator}
-            onChange={handleSheetChanges}
-        >
-            <BottomSheetView style={styles.contentContainer}>
-                {/* Product Summary */}
-                <View style={styles.productSummary}>
-                    <View style={styles.imageContainer}>
-                        <Image
-                            source={product?.image ? (typeof product.image === 'string' ? { uri: product.image } : product.image) : require('../../../assets/icons/Show.png')}
-                            style={styles.productImage}
-                        />
-                    </View>
-                    <View style={styles.productInfo}>
-                        <Text style={styles.productName} numberOfLines={2}>{product?.title || product?.product_name || 'Product Details'}</Text>
-                        <Text style={styles.productPrice}>₹{product?.price || '0.00'}</Text>
-                    </View>
-                </View>
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => setSelectedColor(label)}
+                  style={styles.colorOption}
+                >
+                  <View
+                    style={[
+                      styles.colorPreview,
+                      { backgroundColor: code },
+                    ]}
+                  >
+                    {selectedColor === label && (
+                      <View style={styles.checkMark} />
+                    )}
+                  </View>
+                  <Text
+                    style={[
+                      styles.optionLabel,
+                      selectedColor === label &&
+                        styles.activeOptionLabel,
+                    ]}
+                  >
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
 
-                <View style={styles.divider} />
+        {/* Size Selector */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Select Size:{' '}
+            <Text style={styles.selectedOption}>{selectedSize}</Text>
+          </Text>
 
-                {/* Color Selector */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>
-                        Select Color: <Text style={styles.selectedOption}>{selectedColor}</Text>
-                    </Text>
-                    <View style={styles.optionsRow}>
-                        {colors.map((color, index) => {
-                            const label = typeof color === 'string' ? color : color.label;
-                            const code = typeof color === 'string' ? '#4F46E5' : (color.colorCode || '#4F46E5');
-                            return (
-                                <TouchableOpacity
-                                    key={index}
-                                    onPress={() => setSelectedColor(label)}
-                                    style={[
-                                        styles.colorOption,
-                                        selectedColor === label && styles.selectedColorOption
-                                    ]}
-                                >
-                                    <View style={[styles.colorPreview, { backgroundColor: code }]}>
-                                        {selectedColor === label && (
-                                            <View style={styles.checkMark} />
-                                        )}
-                                    </View>
-                                    <Text style={[styles.optionLabel, selectedColor === label && styles.activeOptionLabel]}>{label}</Text>
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </View>
-                </View>
+          <View style={styles.optionsRow}>
+            {sizes.map((size, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => setSelectedSize(size)}
+                style={[
+                  styles.sizeOption,
+                  selectedSize === size &&
+                    styles.selectedSizeOption,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.sizeText,
+                    selectedSize === size &&
+                      styles.selectedSizeText,
+                  ]}
+                >
+                  {size}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-                {/* Size Selector */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>
-                        Select Size: <Text style={styles.selectedOption}>{selectedSize}</Text>
-                    </Text>
-                    <View style={styles.optionsRow}>
-                        {sizes.map((size, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                onPress={() => setSelectedSize(size)}
-                                style={[
-                                    styles.sizeOption,
-                                    selectedSize === size && styles.selectedSizeOption
-                                ]}
-                            >
-                                <Text style={[
-                                    styles.sizeText,
-                                    selectedSize === size && styles.selectedSizeText
-                                ]}>{size}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </View>
+        {/* Footer Buttons */}
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => bottomSheetRef.current?.close()}
+          >
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
 
-                {/* Footer Buttons */}
-                <View style={styles.footer}>
-                    <TouchableOpacity
-                        style={styles.cancelButton}
-                        onPress={() => bottomSheetRef.current?.close()}
-                    >
-                        <Text style={styles.cancelButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.applyButton}
-                        onPress={handleApply}
-                    >
-                        <Text style={styles.applyButtonText}>Confirm Selection</Text>
-                    </TouchableOpacity>
-                </View>
-
-            </BottomSheetView>
-        </BottomSheet>
-    );
+          <TouchableOpacity
+            style={styles.applyButton}
+            onPress={handleApply}
+          >
+            <Text style={styles.applyButtonText}>
+              Confirm Selection
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </BottomSheetView>
+    </BottomSheet>
+  );
 };
+
+// export default ProductVariantPickerSheet;
 
 const styles = StyleSheet.create({
     bottomSheetBackground: {

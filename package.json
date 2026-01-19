@@ -29,7 +29,6 @@
     "react-native": "^0.80.2",
     "react-native-gesture-handler": "^2.28.0",
     "react-native-modal": "^14.0.0-rc.1",
-    "react-native-pager-view": "^7.0.2",
     "react-native-popup-menu": "^0.18.0",
     "react-native-reanimated": "^3.19.4",
     "react-native-reanimated-carousel": "^4.0.3",

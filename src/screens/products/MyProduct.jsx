@@ -53,11 +53,6 @@ const MyProduct = ({ navigation, route }) => {
                         isFavorite: true // By definition if in this list
                     };
                 });
-            case 'Shared':
-                return saleItems.filter(item => item.IsShared).map(item => ({
-                    ...item,
-                    isFavorite: isFavorite(item.id)
-                }));
             case 'Viewed':
                 return saleItems.filter(item => item.IsViewed).map(item => ({
                     ...item,
@@ -75,7 +70,7 @@ const MyProduct = ({ navigation, route }) => {
         ? tabProducts.filter(item => item.stock === 'In Stock')
         : tabProducts;
 
-    const tabs = ['Wishlist', 'Shared', 'Viewed'];
+    const tabs = ['Wishlist', 'Viewed'];
 
     const handleTabPress = (tab) => {
         setActiveTab(tab);
@@ -88,11 +83,6 @@ const MyProduct = ({ navigation, route }) => {
                 image: require('../../assets/images/MyProduct/WishlistBg.png'),
                 title: 'Your wishlist is empty',
                 subtitle: 'It is simple! Just tap on ❤️ to add any product to \nyour Wishlist'
-            },
-            Shared: {
-                image: require('../../assets/images/MyProduct/SharedBg.png'),
-                title: 'No Products Shared',
-                subtitle: "It's better when shared! Tap on 🔗 to add product here"
             },
             Viewed: {
                 image: require('../../assets/images/MyProduct/WishlistBg.png'),

@@ -48,20 +48,20 @@ export const Header = ({ onBack, onShare, navigation, onPress, onFavoritePress, 
 
 
 // Size and color Selector Component
-export const SizeSelector = ({ item, selectedColor, selectedSize, onAddToCart }) => {
+export const SizeSelector = ({ item, selectedColor, selectedSize, onColorSizeChange }) => {
   return (
     <TouchableOpacity
       style={styles.sizeAndColorSection}
-      onPress={onAddToCart}
+      onPress={onColorSizeChange}
       activeOpacity={0.8}
     >
       <View style={styles.Row}>
-        <Text style={styles.centerText}>{selectedColor || item.color?.[0] || 'Select'}</Text>
+        <Text style={styles.centerText}>{selectedColor}</Text>
         <Text style={styles.subText}>Color</Text>
       </View>
       <View style={styles.verticalDivider} />
       <View style={styles.Row}>
-        <Text style={styles.centerText}>{selectedSize || item.id ? 'S-XL' : (selectedSize || 'Select')}</Text>
+        <Text style={styles.centerText}>{selectedSize}</Text>
         <Text style={styles.subText}>Size</Text>
       </View>
       <View style={styles.ChevronIcon}>
@@ -269,9 +269,6 @@ export const ReviewsSection = ({ reviews, averageRating, totalReviews }) => {
     <View style={styles.reviewsSection}>
       <View style={styles.reviewsHeader}>
         <Text style={[styles.sectionTitle, { fontSize: 28 }]}>{totalReviews} reviews</Text>
-        {/* <View style={styles.ratingBadge}>
-        <Text style={styles.ratingBadgeText}>★ {averageRating}</Text>
-      </View> */}
       </View>
       {!IsfullReview ? reviews.slice(0, 2).map((review, index) => (
         <ReviewItem key={index} {...review} />
@@ -279,7 +276,7 @@ export const ReviewsSection = ({ reviews, averageRating, totalReviews }) => {
         <ReviewItem key={index} {...review} />
       ))}
 
-      <TouchableOpacity
+     {reviews===0 ?  <TouchableOpacity
         activeOpacity={0.9}
         style={styles.loadMoreButton}
         onPress={() => setIsfullReview(!IsfullReview)}
@@ -289,7 +286,7 @@ export const ReviewsSection = ({ reviews, averageRating, totalReviews }) => {
           source={!IsfullReview ? require('../../../assets/icons/DownArrow1.png') : require('../../../assets/icons/UpArrow.png')}
           style={styles.arrowIcon}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> : null}
     </View>
   );
 };

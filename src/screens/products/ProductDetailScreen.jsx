@@ -18,6 +18,7 @@ import { CommonHeader } from '../../components/layout/CommonHeader';
 import ProductGrid from '../../components/features/products/ProductGrid';
 import { productService } from '../../api/productService';
 import { ActivityIndicator, Animated as RNAnimated } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 // Main Screen Component
 export default function ProductDetailScreen({ navigation, route }) {
@@ -104,8 +105,6 @@ export default function ProductDetailScreen({ navigation, route }) {
   useEffect(() => {
     if (!product?.id) return;
     // Optional: persist viewed status locally or via API
-    console.log(`Product ${product.id} viewed`);
-    console.log(`####################Product ${product} #`);
   }, [product]);
 
 
@@ -122,58 +121,31 @@ export default function ProductDetailScreen({ navigation, route }) {
     const productId = target?.id !== undefined ? target.id : target;
     console.log('Toggling favorite for product:', productId, target?.title ? '(Force Local Removal)' : '');
 
-    // if (isLongPress) {
-    //   removeFavoriteLocally(productId);
-    // } else {
-    //   toggleFavorite(productId);
-    // }
   });
 
-  // const handleSharePress = useCallback(() => {
-  //   if (item?.id) {
-  //     item.IsShared = true;
-  //     const sourceItem = ProductData.find(p => p.id === item.id);
-  //     if (sourceItem) {
-  //       sourceItem.IsShared = true;
-  //     }
-  //     Alert.alert('Shared', 'Product shared and added to Shared tab!', [
-  //       { text: 'View', onPress: () => navigation.navigate('MyProduct', { tab: 'Shared' }) },
-  //       { text: 'OK' }
-  //     ]);
-  //   }
-  // }, [item]);
+useEffect(() => {
+  if (
+    saleProduct?.product_additional_details?.Size && saleProduct?.product_additional_details?.Color
+  ) {
+    // console.log("-------------------------- setting size:", saleProduct.product_additional_details.Size);
+    // console.log("-------------------------- setting color:", saleProduct.product_additional_details.Color);
+    setSelectedSize(saleProduct.product_additional_details.Size);
+    setSelectedColor(saleProduct.product_additional_details.Color);
+  }
+}, [saleProduct]);
 
   // Product Options Sheet (Color & Size)
   const [selectedSize, setSelectedSize] = useState('L');
   const [selectedColor, setSelectedColor] = useState('Yellow');
   const productOptionsSheetRef = useRef(null);
   const productOptionsSnapPoints = useMemo(() => ['70%'], []);
-
   // Review Sheet
   const reviewSheetRef = useRef(null);
   const reviewSnapPoints = useMemo(() => ['68%'], []);
 
-  const handleAddToCartFromSheet = (productWithOptions) => {
-    // Update state with selected color and size for persistence
-    setSelectedColor(productWithOptions.color);
-    setSelectedSize(productWithOptions.size);
-
-    // Add to cart with selected options
-    addToCart({
-      productId: saleProduct.id,
-      shopId: saleProduct.shop_id || 1,
-      qty: 1,
-      color: productWithOptions.color,
-      size: productWithOptions.size
-    });
-    // alert("Added to Cart with options!"); // Removed alert to show review sheet immediately
-
-    // Close Product Options Sheet and Open Review Sheet
-    productOptionsSheetRef.current?.close();
-  };
-
 
   const handleColorSizeChange = (options) => {
+    console.log("Selected options from sheet:", options);
     setSelectedColor(options.color);
     setSelectedSize(options.size);
   };
@@ -193,22 +165,13 @@ export default function ProductDetailScreen({ navigation, route }) {
     const updatedReviews = [newReview, ...productReviews];
     setProductReviews(updatedReviews);
 
-    // Update global product data (saleItems)
-    const sourceItem = saleItems.find(p => p.id === saleProduct.id);
-    if (sourceItem) {
-      if (!sourceItem.reviews) sourceItem.reviews = [];
-      sourceItem.reviews = [newReview, ...(sourceItem.reviews || [])];
-
-      // Update overall rating and count
-      const totalRating = updatedReviews.reduce((sum, r) => sum + r.rating, 0);
-      sourceItem.rating = totalRating / updatedReviews.length;
-      sourceItem.reviews.length = updatedReviews.length;
-
-      // Update local saleProduct state to reflect in UI
-      setSaleProduct({
-        ...sourceItem
-      });
-    }
+    // Update local saleProduct state to reflect in UI
+    setSaleProduct({
+      ...saleProduct,
+      reviews: updatedReviews,
+      rating: updatedReviews.reduce((sum, r) => sum + r.rating, 0) / updatedReviews.length,
+      reviewCount: updatedReviews.length
+    });
 
     alert("Thanks for your review!");
     reviewSheetRef.current?.close();
@@ -307,7 +270,7 @@ export default function ProductDetailScreen({ navigation, route }) {
             item={saleProduct}
             selectedSize={selectedSize}
             selectedColor={selectedColor}
-            onAddToCart={() => {
+            onColorSizeChange={() => {
               setIsTabBarVisible(false);
               productOptionsSheetRef.current?.expand();
             }}
@@ -324,7 +287,7 @@ export default function ProductDetailScreen({ navigation, route }) {
             averageRating={saleProduct.rating}
             totalReviews={productReviews.length}
           />
-          <View style={styles.divider} />
+          {productReviews === 0 ? <View style={styles.divider} /> : null}
 
           {similarProducts.length > 0 && (
             <View style={styles.similarSection}>
@@ -364,7 +327,12 @@ export default function ProductDetailScreen({ navigation, route }) {
             color: selectedColor,
             size: selectedSize
           });
-          Alert.alert('Success', 'Added to Bag');
+          // Alert.alert('Success', 'Added to Bag');
+          Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: 'Added to Bag'
+          });
         }}
         onBuyNow={() => {
           addToCart({
@@ -384,7 +352,7 @@ export default function ProductDetailScreen({ navigation, route }) {
         bottomSheetRef={productOptionsSheetRef}
         snapPoints={productOptionsSnapPoints}
         product={saleProduct}
-        onAddToCart={handleAddToCartFromSheet}
+        // onAddToCart={handleAddToCartFromSheet}
         onColorSizeChange={handleColorSizeChange}
         setIsTabBarVisible={setIsTabBarVisible}
       />
@@ -659,7 +627,7 @@ const styles = StyleSheet.create({
     color: '#666',
     lineHeight: 20,
   },
-  similarSection: {
+  similarSectionBottom: {
     marginBottom: 80,
   },
   similarCard: {

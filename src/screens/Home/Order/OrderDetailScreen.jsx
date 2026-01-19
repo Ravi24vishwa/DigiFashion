@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -68,11 +68,7 @@ const OrderDetailScreen = ({ navigation, route }) => {
         if (order?.id) {
             // Update local object
             order.IsShared = true;
-            // Update global source
-            const sourceItem = saleItems.find(p => p.id === order.id);
-            if (sourceItem) {
-                sourceItem.IsShared = true;
-            }
+            // Note: Global source update removed due to undefined saleItems
             Alert.alert('Shared', 'Product shared and added to Shared tab!', [
                 { text: 'View', onPress: () => navigation.navigate('MyProduct', { tab: 'Shared' }) },
                 { text: 'OK' }

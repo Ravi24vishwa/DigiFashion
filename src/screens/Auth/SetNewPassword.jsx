@@ -19,13 +19,23 @@ import {
 } from "react-native-responsive-dimensions";
 import SignUpButton from '../../components/common/SignUpButton';
 import HeaderTextBlock from "../../components/common/HeaderTextBlock";
-const SetNewPassword = ({ navigation }) => {
+const SetNewPassword = ({ navigation, route }) => {
+    const { email } = route.params || {};
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleSavePassword = () => {
-        if (!email.trim() || !password.trim()) {
-            alert("Please enter email and password");
+        if (!password.trim() || !confirmPassword.trim()) {
+            alert("Please enter both passwords");
             return;
         }
+        if (password !== confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+        // Save password logic here
+        alert("Password saved successfully");
+        navigation.navigate('SignIn');
     }
     return (
         <View style={styles.container}>
@@ -80,9 +90,12 @@ const SetNewPassword = ({ navigation }) => {
                                 placeholderTextColor="rgba(255,255,255,0.7)"
                                 style={styles.SignInInputFields}
                                 keyboardType="visible-password"
+                                secureTextEntry
+                                value={password}
+                                onChangeText={setPassword}
                             />
                         </View>
-                        {/* Email Field */}
+                        {/* Confirm Password Field */}
                         <View style={styles.inputWrapper}>
                             <Image
                                 source={require("../../assets/icons/PasswordLock.png")}
@@ -93,6 +106,9 @@ const SetNewPassword = ({ navigation }) => {
                                 placeholderTextColor="rgba(255,255,255,0.7)"
                                 style={styles.SignInInputFields}
                                 keyboardType="visible-password"
+                                secureTextEntry
+                                value={confirmPassword}
+                                onChangeText={setConfirmPassword}
                             />
                         </View>
                     </View>
@@ -102,8 +118,7 @@ const SetNewPassword = ({ navigation }) => {
                        
                          <SignUpButton
                             title={'Save'}
-                            onPress={() => navigation.popToTop('')}
-                            // onPress={handleSendOtp}
+                            onPress={handleSavePassword}
                         />
                     </View>
                 </ScrollView>
