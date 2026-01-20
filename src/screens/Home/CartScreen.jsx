@@ -14,6 +14,7 @@ import PaymentStep from '../../components/features/cart/PaymentStep';
 import SuccessStep from '../../components/features/cart/SuccessStep';
 import EmptyCart from '../../components/features/cart/EmptyCart';
 import { checkoutService } from '../../api/checkoutService'
+import Toast from 'react-native-toast-message';
 const CartScreen = ({ navigation }) => {
   const { cartItems, removeFromCart, updateQuantity, refreshCart, calculateTotal, clearCart } = useCart();
   const { setIsTabBarVisible } = useAppUI();
@@ -55,13 +56,11 @@ const CartScreen = ({ navigation }) => {
   });
 
   // Payment State
-  const [selectedPayment, setSelectedPayment] = useState('Razorpay');
+  const [selectedPayment, setSelectedPayment] = useState('');
 
   const paymentGateways = [
-    { id: 'Razorpay', name: 'Razorpay', image: require('../../assets/icons/RazorPay.png') },
-    { id: 'PayU', name: 'PayU', image: require('../../assets/icons/PayU.png') },
-    { id: 'Instamojo', name: 'Instamojo', image: require('../../assets/icons/Instamojo.png') },
-    { id: 'PayPal', name: 'PayPal', image: require('../../assets/icons/PayPal.png') },
+    // { id: 'Razor', name: 'Razorpay', image: require('../../assets/icons/RazorPay.png') },
+    { id: 'COD', name: 'Cash on Delivery', image: require('../../assets/icons/Cash.png') },
   ];
 
   const handleSaveAddress = async () => {
@@ -134,18 +133,70 @@ const CartScreen = ({ navigation }) => {
     navigation.navigate('HomeTab');
   };
 
+  // const handlePlaceOrder = async () => {
+  //   try {
+  //     // Prepare order data as per API
+  //     const orderData = {
+  //       payment_option: selectedPayment.toLowerCase(),
+  //       // store_id: cartItems[0]?.shop_id || 1,
+  //     };
+
+  //     const res = await submitOrder(orderData);
+  //     if (res.Status === 200) {
+  //       console.log('response of order or submit order', res)
+  //       Toast.show({
+  //         type: 'success',
+  //         text1: 'Order',
+  //         text2: res.Message,
+  //       });
+  //       clearCart();
+  //       setCurrentStep(4);
+  //     }
+  //     else {
+  //       console.log('response of order or submit order', res)
+  //       Toast.show({
+  //         type: 'info',
+  //         text1: 'Order',
+  //         text2: res.Message,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error('Order Submission Error:', error);
+  //   }
+  // };
+
   const handlePlaceOrder = async () => {
+    // ❌ STOP if payment not selected
+    if (!selectedPayment) {
+      Toast.show({
+        type: 'info',
+        text1: 'Payment required',
+        text2: 'Please select a payment method to continue',
+      });
+      return;
+    }
+
     try {
-      // Prepare order data as per API
       const orderData = {
-        delivery_type: 'delivery', // Or from state if we add selection
-        store_id: cartItems[0]?.shop_id || 1, // Defaulting to first item's shop
+        payment_option: selectedPayment.toLowerCase(),
       };
 
       const res = await submitOrder(orderData);
-      if (res) {
+
+      if (res.Status === 200) {
+        Toast.show({
+          type: 'success',
+          text1: 'Order',
+          text2: res.Message,
+        });
         clearCart();
         setCurrentStep(4);
+      } else {
+        Toast.show({
+          type: 'info',
+          text1: 'Order',
+          text2: res.Message,
+        });
       }
     } catch (error) {
       console.error('Order Submission Error:', error);

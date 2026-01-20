@@ -29,27 +29,6 @@ const PaymentStep = ({
                 </TouchableOpacity>
             ))}
 
-            <View style={styles.payInCashHeader}>
-                <View style={styles.horizontalLine} />
-                <Text style={styles.payInCashText}>PAY IN CASH</Text>
-                <View style={styles.horizontalLine} />
-            </View>
-
-            <TouchableOpacity
-                style={[styles.paymentGatewayCard, selectedPayment === 'COD' && styles.activeGatewayCard]}
-                onPress={() => onSelectPayment('COD')}
-            >
-                <View style={styles.gatewayInfo}>
-                    <View style={styles.gatewayLogoContainer}>
-                        <Image source={require('./../../../assets/icons/Cash.png')} style={styles.gatewayLogo} resizeMode="contain" />
-                    </View>
-                    <Text style={[styles.gatewayName, selectedPayment === 'COD' && styles.activeGatewayName]}>Cash on Delivery</Text>
-                </View>
-                <View style={[styles.paymentRadio, selectedPayment === 'COD' && styles.paymentRadioActive]}>
-                    {selectedPayment === 'COD' && <View style={styles.paymentRadioInner} />}
-                </View>
-            </TouchableOpacity>
-
             <PriceDetails
                 cartItemsCount={cartItemsCount}
                 totalProductPrice={totalProductPrice}
@@ -123,23 +102,6 @@ const styles = StyleSheet.create({
         height: 12,
         borderRadius: 6,
         backgroundColor: '#637BDD',
-    },
-    payInCashHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginVertical: 20,
-    },
-    horizontalLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: '#eee',
-    },
-    payInCashText: {
-        fontSize: 10,
-        color: '#999',
-        fontWeight: '700',
-        marginHorizontal: 15,
-        letterSpacing: 1,
     },
 });
 

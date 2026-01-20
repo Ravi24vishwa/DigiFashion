@@ -11,6 +11,7 @@ const AddressStep = ({
     onContinueToPayment
 }) => {
     const [showForm, setShowForm] = useState(addresses.length === 0);
+    const [IsAddressSelected, setIsAddressSelected] = useState(false)
 
     useEffect(() => {
         if (addresses.length > 0) {
@@ -74,18 +75,23 @@ const AddressStep = ({
                     <Text style={styles.addressTypeText}>{item.address_type?.toUpperCase() || 'HOME'}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                    {selectedAddressId === item.id && (
-                        <Image source={require('./../../../assets/icons/Select.png')} style={styles.checkIcon} />
-                    )}
+                    <Image
+                        source={
+                            selectedAddressId === item.id
+                                ? require('./../../../assets/icons/Selected.png')
+                                : require('./../../../assets/icons/UnSelected.png')
+                        }
+                        style={styles.checkIcon}
+                    />
                     <TouchableOpacity onPress={() => handleEdit(item)}>
                         <Image source={require('./../../../assets/icons/edit.png')} style={styles.checkIcon} />
                     </TouchableOpacity>
                 </View>
             </View>
             <Text style={styles.addressName}>{item.title || 'Shipping Address'}</Text>
-            <Text style={styles.addressText}>{item.address_line_1 || item.address}{item.address_line_2 || item.apt ? `, ${item.address_line_2 || item.apt}` : ''}</Text>
-            <Text style={styles.addressText}>{item.city}, {item.pincode || item.zipcode}</Text>
-            <Text style={styles.addressText}>{item.name || item.recipient_name} | {item.phone_no}</Text>
+            <Text style={styles.addressText}>{item.address_line_1}{item.address_line_2 ? `, ${item.address_line_2}` : ''}</Text>
+            <Text style={styles.addressText}>{item.city}, {item.pincode}</Text>
+            <Text style={styles.addressText}>{item.name} | {item.phone_no}</Text>
         </TouchableOpacity>
     );
 
