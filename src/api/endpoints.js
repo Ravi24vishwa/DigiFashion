@@ -27,7 +27,7 @@ export const API_ENDPOINTS = {
     ADDRESS_LIST: 'checkout/address/list',
     ADDRESS_ADD: 'checkout/address/add',
     ADDRESS_APPLY: 'checkout/address/apply',
-    STATES: 'checkout/address/state',
+    // STATES: 'checkout/address/state',
 
     ORDER_LIST: 'order/list',
     ORDER_DETAILS: 'order/details',
