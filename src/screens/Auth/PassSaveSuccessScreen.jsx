@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import GoogleAndFacebookButtonList from '../../Buttons/CustomSocialButton'
+import SignUpButton from '../../components/common/SignUpButton';
 import {
   responsiveWidth,
   responsiveHeight,
@@ -17,15 +17,10 @@ const PassSaveSuccessScreen = ({ navigation }) => {
         <Text style={{ fontWeight: '600', fontSize: 35, color: 'black', marginBottom: responsiveHeight(1), marginTop: responsiveHeight(5) }}>Save Successfully</Text>
         <Text style={{ textAlign: 'center', fontSize: 18, marginBottom: responsiveHeight(6) }}>Your password has been changed {"\n"}  successfully.</Text>
         <View style={{ marginTop: responsiveHeight(6.5) }}>
-          <GoogleAndFacebookButtonList
-            width={responsiveWidth(80)}
-            height={responsiveHeight(6.5)}
-            backgroundColor="#637BDD"
-            title="Back to Login"
-            textColor="white"
-            onPress={() => navigation.navigate('SignInScreen')}
-          // style={{backgroundColor: 'yellow'}}
-          />
+           <SignUpButton
+                title={'Sign In'}
+                onPress={() => navigation.navigate('SignIn')}
+            />
         </View>
       </View>
     </View>

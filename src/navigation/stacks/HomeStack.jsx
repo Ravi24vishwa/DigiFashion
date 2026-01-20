@@ -2,8 +2,8 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // Screens
-import HomeScreen from '../../screens/Home/HomeScreen';
-import ViewAllScreen from '../../screens/Home/ViewAllScreen';
+import HomeScreen from '../../screens/home/HomeScreen';
+import ViewAllScreen from '../../screens/home/ViewAllScreen';
 
 const HomeStack = createNativeStackNavigator();
 
@@ -13,9 +13,7 @@ const HomeStackNavigator = () => {
             screenOptions={{
                 headerShown: false,
                 animation: 'slide_from_right',
-            }}
-            options={{
-                tabBarStyle: { display: 'none' },
+                detachPreviousScreen: false,
             }}
         >
             <HomeStack.Screen

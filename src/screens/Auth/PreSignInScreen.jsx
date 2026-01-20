@@ -2,10 +2,9 @@ import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity } from
 import React from 'react'
 import { RFValue } from "react-native-responsive-fontsize";
 import { responsiveWidth, responsiveHeight } from "react-native-responsive-dimensions";
-import GoogleAndFacebookButtonList from '../../Buttons/CustomSocialButton';
-import SignUpButton from '../../Buttons/SignUpButton';
+import SignUpButton from '../../components/common/SignUpButton';
 import { useNavigation } from '@react-navigation/native';
-import HeaderTextBlock from '../../CommonHelper/HeaderTextBlock';
+import HeaderTextBlock from '../../components/common/HeaderTextBlock';
 const PreSignInScreen = () => {
   const navigation = useNavigation()
   return (
@@ -34,35 +33,6 @@ const PreSignInScreen = () => {
           subtitleStyle={{ fontSize: RFValue(26), fontWeight: '700' }}
         />
         <View style={styles.buttonContainer}>
-          <GoogleAndFacebookButtonList
-            width={responsiveWidth(80)}
-            height={responsiveHeight(6.5)}
-            backgroundColor="white"
-            title="Sign In"
-            textColor="#000"
-            onPress={() => navigation.navigate('SignInScreen')}
-            style={styles.googleBtn} // keeps your variable name exactly same
-          />
-          <GoogleAndFacebookButtonList
-            width={responsiveWidth(80)}
-            height={responsiveHeight(6.5)}
-            backgroundColor="white"
-            title="Log in with Google"
-            textColor="#000"
-            icon={require('../../assets/icons/google.png')}
-            onPress={() => console.log("Google Sign In")}
-            style={styles.googleBtn} // keeps your variable name exactly same
-          />
-          {/* <GoogleAndFacebookButtonList
-            width={responsiveWidth(80)}
-            height={responsiveHeight(6.5)}
-            backgroundColor="#4267B2"
-            title="Log in With Facebook"
-            textColor="white"
-            icon={require('../../assets/icons/facebook.png')}
-            onPress={() => console.log("Facebook Sign In")}
-            style={styles.googleBtn} // keeps your variable name EXACTLY same
-          /> */}
         </View>
       </ImageBackground>
     </View>

@@ -1,74 +1,68 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   FlatList,
   StatusBar,
   Animated,
   Dimensions,
-  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
-import PagerView from 'react-native-pager-view';
-import { kidsCategories, menCategories, womenCategories } from '../../../data/catogoryListScreenData'
+import { categoryService } from '../../../api/categoryService';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const tabs = [
-  { name: 'Men', data: menCategories, color: '#4F46E5' },
-  { name: 'Women', data: womenCategories, color: '#4F46E5' },
-  { name: 'Kids', data: kidsCategories, color: '#4F46E5' },
-];
-
 const CategoriesListScreen = ({ navigation }) => {
-  const [selectedTab, setSelectedTab] = useState(0);
-  const pagerRef = useRef(null);
-  const scrollOffset = useRef(new Animated.Value(0)).current;
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState({});
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetchMainCategories();
+  }, []);
 
-  // Handle tab press
-  const handleTabPress = (index) => {
-    setSelectedTab(index);
-    pagerRef.current?.setPage(index);
+  const fetchMainCategories = async () => {
+    try {
+      setLoading(true);
+      const res = await categoryService.getCategories({ isParent: "0" });
+      setCategories(res.Data || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Handle page change from pager
-  const handlePageSelected = (e) => {
-    setSelectedTab(e.nativeEvent.position);
+  const fetchSubCategories = async (parentId, index) => {
+    if (subCategories[index]) return;
+
+    try {
+      const res = await categoryService.getCategories({ isParent: parentId });
+      setSubCategories(prev => ({
+        ...prev,
+        [index]: res.Data || []
+      }));
+    } catch (error) {
+      console.error(`Error fetching subcategories for parent ${parentId}:`, error);
+    }
   };
 
-  // Animate underline position based on scroll
-  const underlinePosition = scrollOffset.interpolate({
-    inputRange: [0, SCREEN_WIDTH * (tabs.length - 1)],
-    outputRange: [0, (responsiveWidth(100) - 40) / tabs.length * (tabs.length - 1)],
-  });
 
-  // Render individual category page
-  const renderPage = (pageData, index) => (
-    <View key={index} style={styles.page}>
-      <FlatList
-        data={pageData}
-        renderItem={({ item }) => (
-          <CategoryItem
-            item={item}
-            gender={tabs[index].name}
-            navigation={navigation}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
-  );
+  const tabWidth = categories.length > 0 ? (responsiveWidth(100) - 40) / categories.length : 0;
 
-
-
-  // Calculate tab width
-  const tabWidth = (responsiveWidth(100) - 40) / tabs.length;
+  if (loading && categories.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#4F46E5" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -85,81 +79,67 @@ const CategoriesListScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Filter Tabs */}
-      <View style={styles.filterTabsContainer}>
-        <View style={styles.filterTabs}>
-          {tabs.map((tab, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.filterTab}
-              onPress={() => handleTabPress(index)}
-            >
-              <Text
-                style={[
-                  styles.tabText,
-                  selectedTab === index && styles.activeTabText,
-                ]}
-              >
-                {tab.name}
-              </Text>
-              {selectedTab === index && (
-                <View style={[styles.activeDot, { backgroundColor: tab.color }]} />
-              )}
-            </TouchableOpacity>
-          ))}
+      {loading ? (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#4F46E5" />
         </View>
-
-        {/* Animated Underline */}
-        <Animated.View
-          style={[
-            styles.tabUnderline,
-            {
-              width: tabWidth,
-              backgroundColor: tabs[selectedTab]?.color || '#5B6BEE',
-              transform: [{ translateX: underlinePosition }],
-            },
-          ]}
+      ) : (
+        <FlatList
+          data={categories}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <CategoryItem
+              item={item}
+              gender={item.name}
+              navigation={navigation}
+            />
+          )}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>No categories found</Text>
+          }
         />
-      </View>
+      )}
 
-      {/* Slidable Pages */}
-      <PagerView
-        ref={pagerRef}
-        style={styles.pagerView}
-        initialPage={0}
-        onPageSelected={handlePageSelected}
-        onPageScroll={(e) => {
-          const offset = e.nativeEvent.offset + e.nativeEvent.position;
-          scrollOffset.setValue(offset * SCREEN_WIDTH);
-        }}
-        scrollEnabled={true}
-      >
-        {tabs.map((tab, index) => renderPage(tab.data, index))}
-      </PagerView>
     </SafeAreaView>
   );
 };
 
 // Category Item Component
-const CategoryItem = React.memo(({ item, gender, navigation }) => (
-  <TouchableOpacity
-    style={styles.categoryCard}
-    onPress={() => navigation.navigate('CategoryProducts', {
-      categoryName: item.name,
-      gender: gender
-    })}
-  >
-    <Image source={item.image} style={styles.categoryImage} />
-    <View style={styles.categoryInfo}>
-      <Text style={styles.categoryName}>{item.name}</Text>
-      <Text style={styles.categoryItems}>{item.items}</Text>
-    </View>
-    <Image
-      source={require('../../../assets/icons/Forward.png')}
-      style={styles.arrowIcon}
-    />
-  </TouchableOpacity>
-));
+const CategoryItem = React.memo(({ item, gender, navigation }) => {
+  const imageUrl = item.image_url;
+  const data = item;
+  return (
+    <TouchableOpacity
+      style={styles.categoryCard}
+      onPress={() => navigation.navigate('CategoryProducts', {
+        categoryId: item.id || item.category_id,
+        categoryName: item.categorie_name,
+        gender: gender
+      })}
+    >
+      {console.log("category list data ====> ", data)}
+      {imageUrl ? (
+        <Image source={{ uri: imageUrl }} style={styles.categoryImage} />
+      ) : (
+        <View style={[styles.categoryImage, { backgroundColor: '#F3F4F6', justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ color: '#9CA3AF' }}>No Image</Text>
+        </View>
+      )}
+      <View style={styles.categoryInfo}>
+        <Text style={styles.categoryName} numberOfLines={1}>{item.categorie_name}</Text>
+        <Text style={styles.categoryItems}>
+          {item.categorie_name || 'Explore'}
+        </Text>
+      </View>
+      <Image
+        source={require('../../../assets/icons/Forward.png')}
+        style={styles.arrowIcon}
+      />
+    </TouchableOpacity>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -171,7 +151,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 10, // Reduced from 40 as SafeAreaView handles top padding
     paddingBottom: 10,
   },
   headerTitle: {
@@ -206,7 +186,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     position: 'relative',
-    // backgroundColor: 'red'
   },
   tabText: {
     fontSize: 16,
@@ -218,18 +197,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1F2937',
   },
-  activeDot: {
-    // width: 6,
-    // height: 6,
-    // borderRadius: 3,
-    // position: 'absolute',
-    // bottom: 6,
-  },
+  activeDot: {},
   tabUnderline: {
     height: 3,
     borderRadius: 2,
     marginTop: 1,
-    // elevation: 10
   },
   pagerView: {
     flex: 1,
@@ -279,6 +251,17 @@ const styles = StyleSheet.create({
     height: 20,
     tintColor: '#9CA3AF',
     marginRight: 10,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#9CA3AF',
+    marginTop: 10,
   },
 });
 

@@ -2,15 +2,15 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // Screens
-import SplashScreen from '../../screens/Auth/SplashScreen';
-import IntroScreen from '../../screens/Auth/IntroScreen';
-import PreSignInScreen from '../../screens/Auth/PreSignInScreen';
-import SignInScreen from '../../screens/Auth/SignInScreen';
-import SignUpScreen from '../../screens/Auth/SignUpScreen';
-import ForgotPassScreen from '../../screens/Auth/ForgotPassScreen';
-import SetNewPassword from '../../screens/Auth/SetNewPassword';
-import PassSaveSuccessScreen from '../../screens/Auth/PassSaveSuccessScreen';
-import EmailVerificationScreen from '../../screens/Auth/EmailVerificationScreen';
+import SplashScreen from '../../screens/auth/SplashScreen';
+import IntroScreen from '../../screens/auth/IntroScreen';
+import PreSignInScreen from '../../screens/auth/PreSignInScreen';
+import SignInScreen from '../../screens/auth/SignInScreen';
+import SignUpScreen from '../../screens/auth/SignUpScreen';
+import ForgotPassScreen from '../../screens/auth/ForgotPassScreen';
+import SetNewPassword from '../../screens/auth/SetNewPassword';
+import PassSaveSuccessScreen from '../../screens/auth/PassSaveSuccessScreen';
+import EmailVerificationScreen from '../../screens/auth/EmailVerificationScreen';
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {

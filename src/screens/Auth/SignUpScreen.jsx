@@ -13,14 +13,12 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { RFValue } from "react-native-responsive-fontsize";
-import {
-    responsiveWidth,
-    responsiveHeight,
-} from "react-native-responsive-dimensions";
-import GoogleAndFacebookButtonList from "../../Buttons/CustomSocialButton";
-import HeaderTextBlock from "../../CommonHelper/HeaderTextBlock";
+import { responsiveWidth, responsiveHeight } from "react-native-responsive-dimensions";
+import HeaderTextBlock from "../../components/common/HeaderTextBlock";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyOtp } from '../../store/slices/authSlice';
+import Toast from 'react-native-toast-message';
+import SignUpButton from "../../components/common/SignUpButton";
 
 const SignUpScreen = ({ navigation, route }) => {
     const dispatch = useDispatch();
@@ -37,18 +35,23 @@ const SignUpScreen = ({ navigation, route }) => {
     React.useEffect(() => {
         if (receivedOtp) {
             setOtpCode(receivedOtp.toString());
+            Toast.show({
+                type: 'success',
+                text1: 'Done',
+                text2: `OTP ${receivedOtp} received successfully`,
+            });
         }
     }, [receivedOtp]);
 
     const handleSignUp = async () => {
-        data = {
+        const data = {
             name1: name,
             email1: email,
             password1: password,
             otpCode1: otpCode,
             phoneNumber1: phoneNumber
         }
-        console.log(data)
+        console.log('-------------------> data ', data)
 
         if (!name || !email || !password || !otpCode || !phoneNumber) {
             alert("Please fill all fields");
@@ -166,6 +169,7 @@ const SignUpScreen = ({ navigation, route }) => {
                                 keyboardType="phone-pad"
                                 value={phoneNumber}
                                 onChangeText={setPhoneNumber}
+                                maxLength={10}
                             />
                         </View>
 
@@ -182,6 +186,7 @@ const SignUpScreen = ({ navigation, route }) => {
                                 secureTextEntry={!showPassword}
                                 value={password}
                                 onChangeText={setPassword}
+                                maxLength={10}
                             />
                             <TouchableOpacity
                                 onPress={() => setShowPassword(!showPassword)}
@@ -217,48 +222,15 @@ const SignUpScreen = ({ navigation, route }) => {
 
                     {/* Buttons */}
                     <View style={styles.buttonContainer}>
-                        <GoogleAndFacebookButtonList
-                            width={responsiveWidth(80)}
-                            height={responsiveHeight(6.5)}
-                            backgroundColor="white"
-                            title="Sign Up"
-                            textColor="#000"
-                            icon={require('../../assets/icons/email1.png')}
+                        <SignUpButton
+                            title={'Sign In'}
                             onPress={handleSignUp}
-                            style={styles.googleBtn}
+                            style={{ marginBottom: responsiveHeight(2) }}
                         />
-                        <GoogleAndFacebookButtonList
-                            width={responsiveWidth(80)}
-                            height={responsiveHeight(6.5)}
-                            backgroundColor="white"
-                            title="Log in with Google"
-                            textColor="#000"
-                            icon={require('../../assets/icons/google.png')}
-                            onPress={() => console.log("Google Sign In")}
-                            style={styles.googleBtn} // keeps your variable name exactly same
-                        />
-
-                        {/* <GoogleAndFacebookButtonList
-                            width={responsiveWidth(80)}
-                            height={responsiveHeight(6.5)}
-                            backgroundColor="#4267B2"
-                            title="Log in With Facebook"
-                            textColor="white"
-                            icon={require('../../assets/icons/facebook.png')}
-                            onPress={() => console.log("Facebook Sign In")}
-                            style={styles.facebookBtn} // keeps your variable name EXACTLY same
-                        /> */}
-                        <View style={{ flexDirection: 'row' }}>
-                            <Text style={styles.linkText}>
-                                Already a account?{" "}
-                            </Text>
-                            <TouchableOpacity
-                                onPress={() => navigation.replace("SignInScreen")}
-                            >
-                                <Text style={styles.linkBold}>
-                                    Log in
-                                </Text>
-                            </TouchableOpacity>
+                        <View style={styles.LoginTextContainer}>
+                            <Text style={styles.LogInText}>Already Have account?
+                                <TouchableOpacity onPress={() => navigation.popTo('SignInScreen')}>
+                                    <Text style={styles.boldTxt}> Log In</Text></TouchableOpacity></Text>
                         </View>
                     </View>
                 </ScrollView>
@@ -353,6 +325,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         alignItems: "center",
         marginTop: responsiveHeight(4),
+        // backgroundColor: 'red'
     },
 
     linkText: {
@@ -364,4 +337,8 @@ const styles = StyleSheet.create({
         color: "white",
         fontWeight: "800",
     },
+    LoginTextContainer: { alignSelf: 'center' },
+    LogInText: { fontSize: RFValue(18), color: 'white' },
+    boldTxt: { fontWeight: 'bold', fontSize: RFValue(18), color: 'white' },
+
 });

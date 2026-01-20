@@ -17,10 +17,26 @@ import {
     responsiveWidth,
     responsiveHeight,
 } from "react-native-responsive-dimensions";
-import GoogleAndFacebookButtonList from "../../Buttons/CustomSocialButton";
-import HeaderTextBlock from "../../CommonHelper/HeaderTextBlock";
-const SetNewPassword = ({ navigation }) => {
+import SignUpButton from '../../components/common/SignUpButton';
+import HeaderTextBlock from "../../components/common/HeaderTextBlock";
+const SetNewPassword = ({ navigation, route }) => {
+    const { email } = route.params || {};
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
+    const handleSavePassword = () => {
+        if (!password.trim() || !confirmPassword.trim()) {
+            alert("Please enter both passwords");
+            return;
+        }
+        if (password !== confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+        // Save password logic here
+        alert("Password saved successfully");
+        navigation.navigate('SignIn');
+    }
     return (
         <View style={styles.container}>
             <ImageBackground
@@ -73,10 +89,13 @@ const SetNewPassword = ({ navigation }) => {
                                 placeholder="Enter New Password"
                                 placeholderTextColor="rgba(255,255,255,0.7)"
                                 style={styles.SignInInputFields}
-                                keyboardType="email-address"
+                                keyboardType="visible-password"
+                                secureTextEntry
+                                value={password}
+                                onChangeText={setPassword}
                             />
                         </View>
-                        {/* Email Field */}
+                        {/* Confirm Password Field */}
                         <View style={styles.inputWrapper}>
                             <Image
                                 source={require("../../assets/icons/PasswordLock.png")}
@@ -86,21 +105,20 @@ const SetNewPassword = ({ navigation }) => {
                                 placeholder="Confirm Password"
                                 placeholderTextColor="rgba(255,255,255,0.7)"
                                 style={styles.SignInInputFields}
-                                keyboardType="email-address"
+                                keyboardType="visible-password"
+                                secureTextEntry
+                                value={confirmPassword}
+                                onChangeText={setConfirmPassword}
                             />
                         </View>
                     </View>
 
                     {/* Buttons */}
                     <View style={styles.buttonContainer}>
-                        <GoogleAndFacebookButtonList
-                            width={responsiveWidth(70)}
-                            height={responsiveHeight(6.5)}
-                            backgroundColor="#637BDD"
-                            title="Save Password"
-                            textColor="#FFF"
-                            onPress={() => navigation.navigate('PassSaveSuccessScreen')}
-                            style={styles.SendBtn}
+                       
+                         <SignUpButton
+                            title={'Save'}
+                            onPress={handleSavePassword}
                         />
                     </View>
                 </ScrollView>

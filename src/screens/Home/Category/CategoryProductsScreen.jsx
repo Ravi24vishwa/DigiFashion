@@ -1,40 +1,41 @@
 import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react';
-import { SafeAreaView, StatusBar, FlatList, StyleSheet, InteractionManager } from 'react-native';
-import { CommonHeader } from '../../../components/CommonHeader';
-import { FilterBar } from '../../../components/FilterBar';
+import { StatusBar, FlatList, StyleSheet, InteractionManager, ActivityIndicator, View, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { CommonHeader } from '../../../components/layout/CommonHeader';
+import { FilterBar } from '../../../components/features/products/FilterBar';
 
 //bottom sheets
-import { SortBottomSheet } from '../../../components/SortBottomSheet';
-import { CategoryBottomSheet } from '../../../components/CategoryBottomSheet';
-import { FilterBottomSheet } from '../../../components/FilterBottomSheet';
-import CustomProductList from '../../../CommonHelper/CustomProductList'
-import ProductGrid from '../../../CommonHelper/ProductGrid'
-import { useTabBarVisibility } from '../../../contexts/TabBarVisibilityContext';
-import { useCart } from '../../../contexts/CartContext';
-import { useFavorites } from '../../../contexts/FavoritesContext';
+import { SortBottomSheet } from '../../../components/features/products/SortBottomSheet';
+import { CategoryBottomSheet } from '../../../components/features/products/CategoryBottomSheet';
+import { FilterBottomSheet } from '../../../components/features/products/FilterBottomSheet';
+import CustomProductList from '../../../components/features/products/CustomProductList'
+import ProductGrid from '../../../components/features/products/ProductGrid'
+import { useAppUI, useCart, useFavorites } from '../../../hooks';
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
-
 import {
-  products,
   sortOptions,
   categoryOptions,
   filterSections,
-  saleItems
-} from '../../../data/productdata';
-import { handlePress } from '../../../components/Log';
+} from '../../../constants/data/categoryProductScreenData';
+
+import { saleItems } from '../../../constants/data/productdata';
+import { handlePress } from '../../../utils/Log';
+import { productService } from '../../../api/productService';
+import { storage } from '../../../utils/storage';
+import { STORAGE_KEYS } from '../../../constants';
 
 const CategoryProductsScreen = ({ navigation, route }) => {
   //data manupulation
   const { ProductList } = CustomProductList
 
-  const { setIsTabBarVisible } = useTabBarVisibility();
+  const { setIsTabBarVisible } = useAppUI();
   const { cartItems } = useCart();
 
   // ─────────────────────────────
   // STATE
   // ─────────────────────────────
-  const [selectedSort, setSelectedSort] = useState('Popular');
-  const [selectedCategory, setSelectedCategory] = useState('T-shirts');
+  const [selectedSort, setSelectedSort] = useState('newest');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedFilters, setSelectedFilters] = useState({});
 
   // ─────────────────────────────
@@ -43,6 +44,9 @@ const CategoryProductsScreen = ({ navigation, route }) => {
   const sortBottomSheetRef = useRef(null);
   const categoryBottomSheetRef = useRef(null);
   const filterBottomSheetRef = useRef(null);
+
+  const [filterData, setFilterData] = useState(null);
+  const [priceRange, setPriceRange] = useState([0, 1000]);
 
   // ─────────────────────────────
   // SNAP POINTS
@@ -55,7 +59,7 @@ const CategoryProductsScreen = ({ navigation, route }) => {
   // SELECT HANDLERS
   // ─────────────────────────────
   const handleSortSelect = useCallback((sortOption) => {
-    setSelectedSort(sortOption.label);
+    setSelectedSort(sortOption.value);
     sortBottomSheetRef.current?.close();
   }, []);
 
@@ -76,93 +80,121 @@ const CategoryProductsScreen = ({ navigation, route }) => {
     filterBottomSheetRef.current?.close();
   };
 
-  const { categoryName } = route.params;
-
-  // ─────────────────────────────
-  // UI
-  // ─────────────────────────────
-
   const [ClothProductData, setClothProductData] = useState([]);
+  const [baseData, setBaseData] = useState([]);
   const [isReady, setIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
 
-  // Optimize initial load - wait for transition to finish
+  const { categoryId, categoryName } = route.params;
+
+  // Fetch filters from API
   useEffect(() => {
-    const interactionPromise = InteractionManager.runAfterInteractions(() => {
-      setIsReady(true);
-      // Set initial data after transition
-      applyFilters();
-    });
+    const fetchFilters = async () => {
+      try {
+        // 1. Try Cache
+        const cachedFilters = await storage.getItem(STORAGE_KEYS.CACHE_FILTERS);
+        if (cachedFilters) {
+          setFilterData(cachedFilters);
+          if (cachedFilters.price_range) {
+            setPriceRange([
+              parseFloat(cachedFilters.price_range.min),
+              parseFloat(cachedFilters.price_range.max)
+            ]);
+          }
+        }
 
-    return () => interactionPromise.cancel();
+        setIsFilterLoading(true);
+        const res = await productService.getFilters();
+        if (res.Status === 200) {
+          setFilterData(res.Data);
+          // 2. Save fresh filters to cache
+          await storage.setItem(STORAGE_KEYS.CACHE_FILTERS, res.Data);
+
+          if (res.Data.price_range) {
+            setPriceRange([
+              parseFloat(res.Data.price_range.min),
+              parseFloat(res.Data.price_range.max)
+            ]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching filters:', error);
+      } finally {
+        setIsFilterLoading(false);
+      }
+    };
+
+    fetchFilters();
   }, []);
 
-  // Filter application logic reused for both initial load and updates
-  const applyFilters = useCallback(() => {
-    let filteredData = [...saleItems];
+  // Fetch products from API
+  const fetchProducts = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const params = {
+        category_ids: [categoryId],
+        sort_by: selectedSort,
+      };
 
-    // 1. Filter by Selected Category
-    if (selectedCategory && selectedCategory !== 'All') {
-      filteredData = filteredData.filter(item =>
-        item.category?.toLowerCase() === selectedCategory?.toLowerCase()
-      );
-    }
-
-    // 2. Filter by Attributes
-    Object.keys(selectedFilters).forEach(filterKey => {
-      const selectedValues = selectedFilters[filterKey];
-      if (selectedValues && selectedValues.length > 0) {
-        filteredData = filteredData.filter(item => {
-          const itemValue = item[filterKey];
-          if (Array.isArray(itemValue)) {
-            return itemValue.some(val => selectedValues.includes(val));
-          } else {
-            return selectedValues.includes(itemValue);
-          }
-        });
+      if (selectedFilters.brand && selectedFilters.brand.length > 0) {
+        params.brand = selectedFilters.brand.join(',');
       }
-    });
 
-    // 3. Sort
-    switch (selectedSort) {
-      case 'Price: lowest to high':
-      case 'price_low':
-        filteredData.sort((a, b) => a.price - b.price);
-        break;
-      case 'Price: highest to low':
-      case 'price_high':
-        filteredData.sort((a, b) => b.price - a.price);
-        break;
-      case 'Newest':
-      case 'newest':
-        // Assuming higher ID is newer
-        filteredData.sort((a, b) => b.id - a.id);
-        break;
-      case 'Customer review':
-      case 'review':
-        filteredData.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'Popular':
-      case 'popular':
-      default:
-        // Default sort by review count
-        filteredData.sort((a, b) => (b.reviews?.length || 0) - (a.reviews?.length || 0));
-        break;
+      if (selectedFilters.price_range) {
+        params.price_range = `${selectedFilters.price_range[0]}-${selectedFilters.price_range[1]}`;
+      }
+
+      const res = await productService.getProducts(params);
+
+      // Map API data to UI format
+      const mappedData = (res.Data || []).map(p => ({
+        ...p,
+        id: p.id || p.product_id || Math.random().toString(),
+        title: p.name || p.product_name || 'Unnamed Product',
+        price: parseFloat(p.product_price || 0),
+        oldPrice: parseFloat(p.product_mrp || 0),
+        imageUrl: p.product_thumbnail_image_url || p.product_image_url,
+        discount: p.product_discount,
+        category: categoryName,
+        brand: p.product_brand || p.brand || '',
+        rating: parseFloat(p.product_rating || 0),
+        reviews: []
+      }));
+      setBaseData(mappedData);
+      setClothProductData(mappedData);
+    } catch (error) {
+      // Only log if it's a real unexpected error, not just the "No Data" message from API
+      if (error.message !== 'Shop Data not found') {
+        console.error('Error fetching products for category:', error);
+      }
+      // Reset data to empty if API fails or returns "Shop Data not found"
+      setBaseData([]);
+      setClothProductData([]);
+    } finally {
+      setIsLoading(false);
+      setIsReady(true);
     }
+  }, [categoryId, categoryName, selectedSort, selectedFilters]);
 
-    setClothProductData(filteredData);
-  }, [selectedCategory, selectedFilters, selectedSort]);
-
-  // Run filters when dependencies change, but only if view is ready
   useEffect(() => {
-    if (isReady) {
-      applyFilters();
+    if (categoryId) {
+      fetchProducts();
+    } else {
+      setBaseData(saleItems);
+      setIsReady(true);
     }
-  }, [isReady, applyFilters]);
+  }, [categoryId, fetchProducts]);
 
-  const { toggleFavorite, isFavorite } = useFavorites();
+  const { toggleFavorite, isFavorite, removeFavoriteLocally } = useFavorites();
 
-  const handleFavoritePress = (item) => {
-    toggleFavorite(item.id !== undefined ? item.id : item);
+  const handleFavoritePress = (item, isLongPress = false) => {
+    const productId = item.id !== undefined ? item.id : item;
+    if (isLongPress) {
+      removeFavoriteLocally(productId);
+    } else {
+      toggleFavorite(productId);
+    }
   };
 
   return (
@@ -195,22 +227,56 @@ const CategoryProductsScreen = ({ navigation, route }) => {
         }}
       />
 
-      <ProductGrid
-        products={ClothProductData.map(item => ({
-          ...item,
-          isFavorite: isFavorite(item.id)
-        }))}
-        horizontal={false}
-        numColumns={2}
-        cardWidth={"47%"}
-        imageHeight={200}
-        showOldPrice
-        showDiscount
-        showFavorite
-        onProductPress={(item) => navigation.navigate('ProductDetailScreen', item)}
-        onFavoritePress={handleFavoritePress}
-        contentContainerStyle={{ paddingVertical: 10, paddingHorizontal: 10, marginLeft: 10 }}
-      />
+      {isLoading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#4F46E5" />
+          <Text style={{ marginTop: 10, color: '#6B7280' }}>Loading products...</Text>
+        </View>
+      ) : (
+        <ProductGrid
+          products={ClothProductData.map(item => ({
+            ...item,
+            isFavorite: isFavorite(item.id)
+          }))}
+          horizontal={false}
+          numColumns={2}
+          cardWidth={"47%"}
+          imageHeight={200}
+          showOldPrice
+          showDiscount
+          showFavorite
+          onProductPress={(item) => navigation.navigate('ProductDetailScreen', { slug: item.product_slug })}
+          onFavoritePress={(item) => handleFavoritePress(item, false)}
+          onFavoriteLongPress={(item) => handleFavoritePress(item, true)}
+          contentContainerStyle={{ paddingVertical: 10, paddingHorizontal: 10, marginLeft: 10 }}
+          ListEmptyComponent={
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 80, paddingHorizontal: 40 }}>
+              <Text style={{ fontSize: 18, fontWeight: '600', color: '#374151', marginBottom: 8 }}>No products found</Text>
+              <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 24 }}>
+                We couldn't find any products matching your current filters. Try adjusting your price range or selection.
+              </Text>
+              {(Object.keys(selectedFilters).length > 0 || selectedSort !== 'newest') && (
+                <TouchableOpacity
+                  onPress={handleClearAll}
+                  style={{
+                    backgroundColor: '#A855F7',
+                    paddingHorizontal: 24,
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    elevation: 2,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4
+                  }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '600' }}>Clear All Filters</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          }
+        />
+      )}
 
 
 
@@ -219,7 +285,7 @@ const CategoryProductsScreen = ({ navigation, route }) => {
       <SortBottomSheet
         bottomSheetRef={sortBottomSheetRef}
         snapPoints={sortSnapPoints}
-        sortOptions={sortOptions}
+        sortOptions={filterData?.sort_by || sortOptions}
         selectedSort={selectedSort}
         onSelectSort={handleSortSelect}
         setIsTabBarVisible={setIsTabBarVisible}
@@ -239,7 +305,7 @@ const CategoryProductsScreen = ({ navigation, route }) => {
       <FilterBottomSheet
         bottomSheetRef={filterBottomSheetRef}
         snapPoints={filterSnapPoints}
-        filterSections={filterSections}
+        filterData={filterData}
         selectedFilters={selectedFilters}
         onFilterChange={handleFilterChange}
         onClearAll={handleClearAll}
