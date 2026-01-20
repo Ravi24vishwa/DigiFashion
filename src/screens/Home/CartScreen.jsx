@@ -13,7 +13,7 @@ import AddressStep from '../../components/features/cart/AddressStep';
 import PaymentStep from '../../components/features/cart/PaymentStep';
 import SuccessStep from '../../components/features/cart/SuccessStep';
 import EmptyCart from '../../components/features/cart/EmptyCart';
-
+import { checkoutService } from '../../api/checkoutService'
 const CartScreen = ({ navigation }) => {
   const { cartItems, removeFromCart, updateQuantity, refreshCart, calculateTotal, clearCart } = useCart();
   const { setIsTabBarVisible } = useAppUI();
@@ -25,11 +25,11 @@ const CartScreen = ({ navigation }) => {
     // fetchStates,
     selectedAddressId,
     applyAddress,
-    submitOrder
+    submitOrder,
+    saveAddress
   } = useCheckout();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedItemId, setSelectedItemId] = useState(null);
-
   useEffect(() => {
     refreshCart();
   }, [refreshCart]);
@@ -41,13 +41,17 @@ const CartScreen = ({ navigation }) => {
 
   // Address Form State
   const [addressForm, setAddressForm] = useState({
-    flatNo: '',
-    landmark: '',
-    pincode: '',
-    state: '',
+    id: null,
+    title: '',
+    address_type: 'home',
+    address_line_1: '',
+    address_line_2: '',
     city: '',
+    state: '',
+    pincode: '',
     name: '',
-    phone: ''
+    phone_no: '',
+    default: 0
   });
 
   // Payment State
@@ -60,11 +64,36 @@ const CartScreen = ({ navigation }) => {
     { id: 'PayPal', name: 'PayPal', image: require('../../assets/icons/PayPal.png') },
   ];
 
+  const handleSaveAddress = async () => {
+    try {
+      const res = await saveAddress(addressForm);
+      if (res) {
+        setAddressForm({
+          id: null,
+          title: '',
+          address_type: 'home',
+          address_line_1: '',
+          address_line_2: '',
+          city: '',
+          state: '',
+          pincode: '',
+          name: '',
+          phone_no: '',
+          default: 0
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('[CartScreen] Save address error:', error);
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (cartItems && cartItems.length > 0) {
       setSelectedItemId(cartItems[0].cart_item_id || cartItems[0].id);
     }
-    console.log('cart data============>', cartItems)
   }, [cartItems]);
 
 
@@ -205,12 +234,12 @@ const CartScreen = ({ navigation }) => {
       {currentStep === 2 && (
         <AddressStep
           addresses={addresses}
-          states={states}
           selectedAddressId={selectedAddressId}
           onSelectAddress={applyAddress}
           addressForm={addressForm}
           setAddressForm={setAddressForm}
-          onSaveAndContinue={() => setCurrentStep(3)}
+          onSaveAddress={handleSaveAddress}
+          onContinueToPayment={() => setCurrentStep(3)}
         />
       )}
 

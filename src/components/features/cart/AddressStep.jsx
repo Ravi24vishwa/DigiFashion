@@ -1,16 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 
 const AddressStep = ({
     addresses,
-    states,
     selectedAddressId,
     onSelectAddress,
     addressForm,
     setAddressForm,
-    onSaveAndContinue
+    onSaveAddress,
+    onContinueToPayment
 }) => {
     const [showForm, setShowForm] = useState(addresses.length === 0);
+
+    useEffect(() => {
+        if (addresses.length > 0) {
+            setShowForm(false);
+        } else {
+            setShowForm(true);
+        }
+    }, [addresses.length]);
+
+    const handleEdit = (item) => {
+        setAddressForm({
+            id: item.id,
+            title: item.title || '',
+            address_type: item.address_type || 'home',
+            address_line_1: item.address_line_1 || '',
+            address_line_2: item.address_line_2 || '',
+            city: item.city || '',
+            state: item.state || '',
+            pincode: item.pincode || '',
+            name: item.name || '',
+            phone_no: item.phone_no || '',
+            default: item.default || 0
+        });
+        setShowForm(true);
+    };
+
+    const handleAddNew = () => {
+        setAddressForm({
+            id: null,
+            title: '',
+            address_type: 'home',
+            address_line_1: '',
+            address_line_2: '',
+            city: '',
+            state: '',
+            pincode: '',
+            name: '',
+            phone_no: '',
+            default: 0
+        });
+        setShowForm(true);
+    };
+
+    const onSaveInternal = async () => {
+        const success = await onSaveAddress();
+        if (success) {
+            setShowForm(false);
+        }
+    };
 
     const renderAddressItem = ({ item }) => (
         <TouchableOpacity
@@ -25,17 +74,18 @@ const AddressStep = ({
                     <Text style={styles.addressTypeText}>{item.address_type?.toUpperCase() || 'HOME'}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                {selectedAddressId === item.id && (
-                    <Image source={require('./../../../assets/icons/Select.png')} style={styles.checkIcon} />
-                )}
-                <TouchableOpacity onPress={() => console.log('Edit address', item.id)}>
-                <Image source={require('./../../../assets/icons/edit.png')} style={styles.checkIcon} />
-                </TouchableOpacity>
+                    {selectedAddressId === item.id && (
+                        <Image source={require('./../../../assets/icons/Select.png')} style={styles.checkIcon} />
+                    )}
+                    <TouchableOpacity onPress={() => handleEdit(item)}>
+                        <Image source={require('./../../../assets/icons/edit.png')} style={styles.checkIcon} />
+                    </TouchableOpacity>
                 </View>
             </View>
             <Text style={styles.addressName}>{item.title || 'Shipping Address'}</Text>
-            <Text style={styles.addressText}>{item.address}, {item.apt}</Text>
-            <Text style={styles.addressText}>{item.city}, {item.zipcode}</Text>
+            <Text style={styles.addressText}>{item.address_line_1 || item.address}{item.address_line_2 || item.apt ? `, ${item.address_line_2 || item.apt}` : ''}</Text>
+            <Text style={styles.addressText}>{item.city}, {item.pincode || item.zipcode}</Text>
+            <Text style={styles.addressText}>{item.name || item.recipient_name} | {item.phone_no}</Text>
         </TouchableOpacity>
     );
 
@@ -51,7 +101,7 @@ const AddressStep = ({
                     ))}
                     <TouchableOpacity
                         style={styles.addNewButton}
-                        onPress={() => setShowForm(true)}
+                        onPress={handleAddNew}
                     >
                         <Text style={styles.addNewButtonText}>+ Add New Address</Text>
                     </TouchableOpacity>
@@ -59,17 +109,16 @@ const AddressStep = ({
                     {selectedAddressId && (
                         <TouchableOpacity
                             style={styles.bigAddAddressBtn}
-                            onPress={onSaveAndContinue}
+                            onPress={onContinueToPayment}
                         >
                             <Text style={styles.bigAddAddressText}>Deliver to this Address</Text>
                         </TouchableOpacity>
                     )}
                 </View>
             )}
-
             {(showForm || addresses.length === 0) && (
                 <View style={styles.formContainer}>
-                    <Text style={styles.sectionTitle}>Add New Address</Text>
+                    <Text style={styles.sectionTitle}>{addressForm.id ? 'Edit Address' : 'Add New Address'}</Text>
                     <TextInput
                         style={styles.inputField}
                         placeholder="Address Title (e.g. Home, Office)"
@@ -77,36 +126,61 @@ const AddressStep = ({
                         value={addressForm.title}
                         onChangeText={(val) => setAddressForm({ ...addressForm, title: val })}
                     />
+                    <View style={styles.typeContainer}>
+                        {['home', 'office', 'other'].map((type) => (
+                            <TouchableOpacity
+                                key={type}
+                                style={[
+                                    styles.typeButton,
+                                    addressForm.address_type === type && styles.selectedTypeButton
+                                ]}
+                                onPress={() => setAddressForm({ ...addressForm, address_type: type })}
+                            >
+                                <Text style={[
+                                    styles.typeButtonText,
+                                    addressForm.address_type === type && styles.selectedTypeButtonText
+                                ]}>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
                     <TextInput
                         style={styles.inputField}
                         placeholder="Flat/House No/Building"
                         placeholderTextColor="#999"
-                        value={addressForm.flatNo}
-                        onChangeText={(val) => setAddressForm({ ...addressForm, flatNo: val })}
+                        value={addressForm.address_line_2}
+                        onChangeText={(val) => setAddressForm({ ...addressForm, address_line_2: val })}
                     />
                     <TextInput
                         style={styles.inputField}
                         placeholder="Street Address / Landmark"
                         placeholderTextColor="#999"
-                        value={addressForm.landmark}
-                        onChangeText={(val) => setAddressForm({ ...addressForm, landmark: val })}
+                        value={addressForm.address_line_1}
+                        onChangeText={(val) => setAddressForm({ ...addressForm, address_line_1: val })}
                     />
+                    <View style={styles.row}>
+                        <TextInput
+                            style={[styles.inputField, { flex: 1, marginRight: 10 }]}
+                            placeholder="City"
+                            placeholderTextColor="#999"
+                            value={addressForm.city}
+                            onChangeText={(val) => setAddressForm({ ...addressForm, city: val })}
+                        />
+                        <TextInput
+                            style={[styles.inputField, { flex: 1 }]}
+                            placeholder="Pincode"
+                            placeholderTextColor="#999"
+                            keyboardType="numeric"
+                            maxLength={6}
+                            value={addressForm.pincode}
+                            onChangeText={(val) => setAddressForm({ ...addressForm, pincode: val })}
+                        />
+                    </View>
                     <TextInput
                         style={styles.inputField}
-                        placeholder="Pincode"
+                        placeholder="State"
                         placeholderTextColor="#999"
-                        keyboardType="numeric"
-                        value={addressForm.pincode}
-                        onChangeText={(val) => setAddressForm({ ...addressForm, pincode: val })}
-                    />
-
-                    {/* Placeholder for State selection list/modal */}
-                    <TextInput
-                        style={styles.inputField}
-                        placeholder="City"
-                        placeholderTextColor="#999"
-                        value={addressForm.city}
-                        onChangeText={(val) => setAddressForm({ ...addressForm, city: val })}
+                        value={addressForm.state}
+                        onChangeText={(val) => setAddressForm({ ...addressForm, state: val })}
                     />
 
                     <View style={styles.contactHeader}>
@@ -127,17 +201,18 @@ const AddressStep = ({
                             placeholder="Contact Number"
                             placeholderTextColor="#999"
                             keyboardType="phone-pad"
-                            value={addressForm.phone}
-                            onChangeText={(val) => setAddressForm({ ...addressForm, phone: val })}
+                            maxLength={10}
+                            value={addressForm.phone_no}
+                            onChangeText={(val) => setAddressForm({ ...addressForm, phone_no: val })}
                         />
                     </View>
 
                     <View style={styles.formActions}>
                         <TouchableOpacity
                             style={styles.bigAddAddressBtn}
-                            onPress={onSaveAndContinue}
+                            onPress={onSaveInternal}
                         >
-                            <Text style={styles.bigAddAddressText}>Save Address and Continue</Text>
+                            <Text style={styles.bigAddAddressText}>Save Address</Text>
                         </TouchableOpacity>
 
                         {addresses.length > 0 && (
@@ -243,6 +318,36 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         borderWidth: 1,
         borderColor: '#f0f0f0',
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    typeContainer: {
+        flexDirection: 'row',
+        gap: 12,
+        marginBottom: 16,
+    },
+    typeButton: {
+        flex: 1,
+        paddingVertical: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+    selectedTypeButton: {
+        borderColor: '#637BDD',
+        backgroundColor: '#EEF2FF',
+    },
+    typeButtonText: {
+        fontSize: 12,
+        color: '#4B5563',
+        fontWeight: '600',
+    },
+    selectedTypeButtonText: {
+        color: '#637BDD',
     },
     contactHeader: {
         flexDirection: 'row',

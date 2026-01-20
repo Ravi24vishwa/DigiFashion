@@ -28,20 +28,6 @@ export const useCheckout = () => {
         }
     }, []);
 
-    // const fetchStates = useCallback(async () => {
-    //     try {
-    //         const res = await checkoutService.getStates();
-    //         setStates(res.Data || []);
-    //     } catch (err) {
-    //         Toast.show({
-    //             type: 'error',
-    //             text1: 'Error fetching states',
-    //             text2: err.message || 'Something went wrong'
-    //         });
-    //         console.error('Error fetching states:', err);
-    //     }
-    // }, []);
-
     const saveAddress = async (addressData) => {
         setIsLoading(true);
         try {
