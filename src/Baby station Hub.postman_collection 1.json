@@ -1114,41 +1114,6 @@
 					"response": []
 				},
 				{
-					"name": "checkout-address-state",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "10|b0v17fTvjqG8wmJgoMBrRIDilOOZhYxVL7tRjJHYfcfffef6",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{online_url}}checkout/address/state",
-							"host": [
-								"{{online_url}}checkout"
-							],
-							"path": [
-								"address",
-								"state"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "checkout-address-apply",
 					"request": {
 						"auth": {

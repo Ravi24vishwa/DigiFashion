@@ -22,7 +22,7 @@ const CartScreen = ({ navigation }) => {
     states,
     isLoading: isCheckoutLoading,
     fetchAddresses,
-    fetchStates,
+    // fetchStates,
     selectedAddressId,
     applyAddress,
     submitOrder
@@ -84,9 +84,9 @@ const CartScreen = ({ navigation }) => {
   useEffect(() => {
     if (currentStep === 2) {
       fetchAddresses();
-      fetchStates();
+      // fetchStates();
     }
-  }, [currentStep, fetchAddresses, fetchStates]);
+  }, [currentStep, fetchAddresses]);
 
   useEffect(() => {
     // Hide Bottom Tab Bar on Step 3 (Payment) and Step 4 (Success)

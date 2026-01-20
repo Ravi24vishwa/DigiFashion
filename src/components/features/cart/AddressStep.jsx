@@ -24,9 +24,14 @@ const AddressStep = ({
                 <View style={styles.addressTypeBadge}>
                     <Text style={styles.addressTypeText}>{item.address_type?.toUpperCase() || 'HOME'}</Text>
                 </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 {selectedAddressId === item.id && (
-                    <Image source={require('./../../../assets/icons/Show.png')} style={styles.checkIcon} />
+                    <Image source={require('./../../../assets/icons/Select.png')} style={styles.checkIcon} />
                 )}
+                <TouchableOpacity onPress={() => console.log('Edit address', item.id)}>
+                <Image source={require('./../../../assets/icons/edit.png')} style={styles.checkIcon} />
+                </TouchableOpacity>
+                </View>
             </View>
             <Text style={styles.addressName}>{item.title || 'Shipping Address'}</Text>
             <Text style={styles.addressText}>{item.address}, {item.apt}</Text>
@@ -186,6 +191,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 8,
+        // backgroundColor: 'red'
     },
     addressTypeBadge: {
         backgroundColor: '#E5E7EB',
@@ -200,7 +206,7 @@ const styles = StyleSheet.create({
     },
     checkIcon: {
         width: 20,
-        height: 20,
+        height: 21,
         tintColor: '#637BDD',
     },
     addressName: {

@@ -5,9 +5,9 @@ export const checkoutService = {
     /**
      * Get list of states for address form
      */
-    getStates: async () => {
-        return await api.get(API_ENDPOINTS.STATES);
-    },
+    // getStates: async () => {
+    //     return await api.get(API_ENDPOINTS.STATES);
+    // },
 
     /**
      * Get user's saved addresses
