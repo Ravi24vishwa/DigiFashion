@@ -116,23 +116,40 @@ export default function ProductDetailScreen({ navigation, route }) {
     return () => task.cancel();
   }, []);
 
-  const handleFavoritePress = useCallback((product) => {
-    const target = product || saleProduct;
-    const productId = target?.id !== undefined ? target.id : target;
-    console.log('Toggling favorite for product:', productId, target?.title ? '(Force Local Removal)' : '');
+  const handleFavoritePress = useCallback((item, forceLocal = false) => {
+    const target = item || saleProduct;
+    if (!target) return;
 
-  });
+    const productId = target.id || target.product_id;
 
-useEffect(() => {
-  if (
-    saleProduct?.product_additional_details?.Size && saleProduct?.product_additional_details?.Color
-  ) {
-    // console.log("-------------------------- setting size:", saleProduct.product_additional_details.Size);
-    // console.log("-------------------------- setting color:", saleProduct.product_additional_details.Color);
-    setSelectedSize(saleProduct.product_additional_details.Size);
-    setSelectedColor(saleProduct.product_additional_details.Color);
-  }
-}, [saleProduct]);
+    if (forceLocal) {
+      removeFavoriteLocally(productId);
+      Toast.show({
+        type: 'info',
+        text1: 'Removed',
+        text2: 'Item removed from favorites locally'
+      });
+    } else {
+      toggleFavorite(productId);
+      const currentlyFavorite = isFavorite(productId);
+      Toast.show({
+        type: 'success',
+        text1: 'Wishlist',
+        text2: currentlyFavorite ? 'Removed from Wishlist' : 'Added to Wishlist'
+      });
+    }
+  }, [saleProduct, toggleFavorite, isFavorite, removeFavoriteLocally]);
+
+  useEffect(() => {
+    if (
+      saleProduct?.product_additional_details?.Size && saleProduct?.product_additional_details?.Color
+    ) {
+      // console.log("-------------------------- setting size:", saleProduct.product_additional_details.Size);
+      // console.log("-------------------------- setting color:", saleProduct.product_additional_details.Color);
+      setSelectedSize(saleProduct.product_additional_details.Size);
+      setSelectedColor(saleProduct.product_additional_details.Color);
+    }
+  }, [saleProduct]);
 
   // Product Options Sheet (Color & Size)
   const [selectedSize, setSelectedSize] = useState('L');
@@ -263,7 +280,7 @@ useEffect(() => {
           <ProductInfo
             item={saleProduct}
             onPress={handleFavoritePress}
-            // onShare={handleSharePress}
+          // onShare={handleSharePress}
           />
           <View style={styles.divider} />
           <SizeSelector

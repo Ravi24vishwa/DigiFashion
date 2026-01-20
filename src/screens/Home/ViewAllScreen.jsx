@@ -31,7 +31,7 @@ const ViewAllScreen = ({ navigation }) => {
     console.log("-----------> favorite pressed", productId)
     if (isLongPress) {
       removeFavoriteLocally(productId);
-    } else {  
+    } else {
       toggleFavorite(productId);
     }
   };
@@ -98,7 +98,8 @@ const ViewAllScreen = ({ navigation }) => {
           oldPrice: parseFloat(p.product_mrp || 0),
           imageUrl: p.product_thumbnail_image_url,
           id: p.id || p.product_id,
-          discount: p.product_discount
+          discount: p.product_discount,
+          isFavorite: isFavorite(p.id || p.product_id)
         })))}
         horizontal={false}
         numColumns={2}

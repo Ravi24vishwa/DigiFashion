@@ -65,26 +65,17 @@ export const toggleFavoriteAsync = createAsyncThunk(
       const response = await api.post(API_ENDPOINTS.FAVORITE_TOGGLE, { product_id: normalizedId });
       console.log('[REDUX-STEP 3] toggleFavorite successful', response);
 
-      // [ONE WAY RESOLVE] After every successful toggle, refresh the full list 
-      // from server to ensure local state (IDs + full Items) matches perfectly.
-      dispatch(fetchFavorites());
+      // [IMPROVED APPROACH] No longer dispatching fetchFavorites() here.
+      // The extraReducer will handle updating favoriteIds and items based on the normalizedId.
 
       return normalizedId;
     } catch (error) {
       const errorMessage = error.message || '';
 
-      // Handle "Duplicate entry" as a soft success (sync via refresh)
+      // Handle "Duplicate entry" as a soft success (already in favorites)
       if (errorMessage.includes('Duplicate entry') || errorMessage.includes('1062')) {
-        console.warn('[REDUX-STEP INFO] Item already in favorites (Duplicate entry). Syncing via refresh.');
-
-        // Even on duplicate, we refresh to make sure we didn't miss anything
-        dispatch(fetchFavorites());
-
-        return rejectWithValue({
-          message: 'Duplicate entry',
-          isDuplicate: true,
-          productId: normalizedId
-        });
+        console.warn('[REDUX-STEP INFO] Item already in favorites (Duplicate entry).');
+        return normalizedId; // Treat as success for the UI state
       }
 
       console.error('[REDUX-STEP ERROR] toggleFavorite failed:', error.message);
@@ -157,6 +148,12 @@ const favoritesSlice = createSlice({
         } else {
           state.error = errorMessage;
         }
+      })
+      // Clear favorites on logout
+      .addCase('auth/logout', (state) => {
+        state.favoriteIds = [];
+        state.items = [];
+        state.error = null;
       });
   },
 });
