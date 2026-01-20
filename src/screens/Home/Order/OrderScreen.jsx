@@ -10,7 +10,6 @@ import {
   Dimensions,
   FlatList,
 } from 'react-native';
-import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import { CommonHeader } from '../../../components/layout/CommonHeader';
 import { useCart, useOrders } from '../../../hooks';
 import PromoBanner from '../../../components/features/home/PromoBanner';
@@ -24,7 +23,7 @@ const OrderScreen = ({ navigation }) => {
   const { cartItems } = useCart();
   const { orders, isLoading, fetchOrders } = useOrders();
 
-  const filterOptions = ['All', 'Ordered', 'Shipped',  'Delivered',  'Cancelled', 'Exchange',  'Return', ];
+  const filterOptions = ['All', 'Ordered', 'Shipped', 'Delivered', 'Cancelled', 'Exchange', 'Return',];
 
   useEffect(() => {
     fetchOrders();

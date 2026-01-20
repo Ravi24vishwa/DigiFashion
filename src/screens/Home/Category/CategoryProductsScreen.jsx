@@ -161,9 +161,6 @@ const CategoryProductsScreen = ({ navigation, route }) => {
         rating: parseFloat(p.product_rating || 0),
         reviews: []
       }));
-
-      console.log("data of place =================>", res.Data)
-
       setBaseData(mappedData);
       setClothProductData(mappedData);
     } catch (error) {
