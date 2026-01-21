@@ -128,7 +128,8 @@ const EmailVerificationScreen = ({ navigation }) => {
                     email: res.user.email,
                     google_id: res.user.uid,
                     name: res.user.displayName,
-                    profile_pic: res.user.photoURL
+                    profile_pic: res.user.photoURL,
+                    device_id: 'sample_device_id_12345' // Replace with actual device ID retrieval logic
                 };
 
                 console.log("------------------Dispatching googleLogin with payload:", payload);

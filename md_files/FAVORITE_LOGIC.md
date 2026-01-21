@@ -42,43 +42,22 @@ This document outlines the implementation of the "Favorites" (Wishlist) logic ac
 
 ---
 
-## 3. Suggested Improved Approach
+## 3. Current Implementation (Optimized)
 
-For a simpler, more understandable, and high-performance favorites system, the following approach is recommended:
+The "Suggested Improved Approach" has been fully implemented as of January 20, 2026:
 
-### A. Pure Optimistic UI Update
-Instead of fetching the whole list after a toggle, update the Redux state immediately:
-```javascript
-// In favoritesSlice.js
-.addCase(toggleFavoriteAsync.pending, (state, action) => {
-    const productId = Number(action.meta.arg);
-    const index = state.favoriteIds.indexOf(productId);
-    if (index === -1) {
-        state.favoriteIds.push(productId); // Assume liked
-    } else {
-        state.favoriteIds.splice(index, 1); // Assume unliked
-    }
-})
-```
-*If the API fails, roll back the change in `.rejected`.*
+### A. Pure Optimistic UI Update ✅
+The Redux state is now updated immediately in the `extraReducers` for `toggleFavoriteAsync`. 
+- **Pending/Fulfilled**: We handle the `favoriteIds` array locally before/during the API call.
+- **Result**: Heart icons respond instantly without waiting for network round-trips.
 
-### B. Standardized Response Model
-The backend should ideally return the current "liked" status or the updated list in the response of the `POST /favorite` call. This would remove the need for a second `fetchFavorites()` call.
+### B. Standardized Logic ✅
+- Removed the redundant `fetchFavorites()` call from the `toggleFavoriteAsync` thunk.
+- Logic now relies on Redux state persistence and smart error handling for "Duplicate entry" (SQL 1062).
 
-### C. Shared Identifier
-Stick to a single naming convention for IDs. Currently, the code checks `item.id`, `item.product_id`, and `item.order_id`.
-- **Recommendation**: Map all API items to a standard UI model `{ id, title, price, image }` as soon as they are received in the API service/hook layer.
+### C. UI Bug Fixes ✅
+- **ProductDetailScreen**: Fixed a non-functional favorite button and added Toast feedback.
+- **ViewAllScreen**: Added missing `isFavorite` mapping to ensure consistent UI across all lists.
 
-### D. Better Hook Logic
-Simplify `useFavorites` to handle the complexity internally:
-```javascript
-const toggleFavorite = (product) => {
-    // 1. Dispatch toggle
-    dispatch(toggleFavoriteAsync(product.id));
-    // 2. No need for fetchFavorites() here! 
-    // Redux should have already updated favoriteIds optimistically.
-};
-```
-
-### E. Manual Maintenance Doc
-Always clear favorites Redux state on **Logout** to prevent the next user on the same device from seeing the previous user's wishlist. (Add `clearFavorites` to the logout thunk).
+### D. Logout Security ✅
+- Added a listener to the `favoritesSlice` that automatically clears the wishlist state when `auth/logout` is dispatched.

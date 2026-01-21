@@ -11,6 +11,9 @@ This document describes the current folder structure and the responsibilities of
 *   **App.jsx**: The entry point of the application, responsible for setting up providers (Redux, Contexts) and initializing the navigation.
 *   **index.js**: Register the main application component with the React Native bridge.
 *   **package.json**: Lists project dependencies, scripts, and basic metadata.
+*   **FAVORITE_LOGIC.md**: Detailed documentation of the optimized wishlist implementation.
+*   **MARKDOWN_FILES_LIST.md**: A categorized and date-sorted list of all project documentation.
+*   **CURRENT_STATE_SUMMARY.md**: High-level overview of project health and progress.
 *   **babel.config.js**: Configuration for Babel transpilation.
 *   **metro.config.js**: Configuration for the Metro bundler.
 *   **tsconfig.json**: Basic TypeScript configuration (the project mostly uses .jsx but has TS support).

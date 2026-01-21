@@ -38,13 +38,18 @@ The `src/api/apiService.js` provides a centralized `api` object with standard HT
 *   **Error Handling**: It converts non-200 responses or "logical errors" (where the status is 200 but the body contains success: false) into thrown Errors.
 *   **JSON Parsing**: It automatically parses response bodies using `response.json()`.
 
-## Data Interaction Pattern
+## Data Interaction Pattern (Optimized)
 
-1.  **Screen** calls a method from a **Hook** (e.g., `useCart`).
-2.  **Hook** dispatches an **AsyncThunk** (from a Slice).
-3.  **AsyncThunk** calls an **API Service**.
-4.  **API Service** uses the **Base API Wrapper** to hit the endpoint.
-5.  **Base API Wrapper** injects the token and performs the fetch.
-6.  **Redux State** is updated based on the result.
-7.  **Hook** returns the updated state to the **Screen**.
-8.  **Screen** re-renders with the new data.
+1.  **Screen** (e.g., `ProductDetailScreen`) calls a method from a **Hook** (`useFavorites`).
+2.  **Hook** dispatches an **AsyncThunk** (`toggleFavoriteAsync`).
+3.  **Redux Slice** immediately performs an **Optimistic Update** in its reducer logic, updating the UI before the API responds.
+4.  **API Service** hits the endpoint.
+5.  **Redux State** finalizes based on the result (retaining the change on success or rolling back on failure).
+6.  **Screen** re-renders instantly with the new data.
+
+## Checkout Flow Lifecycle
+
+1.  **Address Selection**: The screen fetches saved addresses and highlights the selected one. Users can edit/add new addresses using a form that maps to strictly defined API keys (`address_line_1`, `pincode`, etc.).
+2.  **Payment Selection**: Only specific gateways (COD, Razorpay) are allowed. Selection is mandatory before order submission.
+3.  **Order Submission**: The `handlePlaceOrder` function normalizes data (e.g., payment method to lowercase) and calls `submitOrder`. 
+4.  **Completion**: Upon success, the cart is cleared (via Redux), and the user is navigated to a Success screen.

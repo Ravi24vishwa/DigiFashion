@@ -32,6 +32,7 @@ This document provides a point-in-time snapshot of the environment and dependenc
 
 *   **React 19 & React Native**: This project is using one of the first versions of React Native (0.80) to officially support/target React 19. This is an experimental frontier for many libraries.
 *   **Nav-Native Conflict**: The presence of `enableScreens(false)` in `App.jsx` suggests a conflict between `react-native-screens` and the current navigation implementation or the React 19 architectural changes.
-*   **State Redundancy**: The project contains both older synchronous Redux hooks (`useAppCart` in `useAppData.js`) and newer asynchronous logic (`useCart` in `useCart.js`).
-*   **Asset Paths**: The project recently underwent a refactoring of asset import paths (e.g., updating `../assets` to `../../assets`), making the asset management layer sensitive to file relocation.
+*   **State Redundancy**: Ongoing stabilization (Jan 20, 2026). The "Favorites" logic has been consolidated into an optimized Redux flow, though some overlapping hooks like `useAppCart` still exist and are slated for cleanup.
+*   **Documentation Suite**: The project now includes a robust documentation set, including `FAVORITE_LOGIC.md`, `MARKDOWN_FILES_LIST.md`, and several stability reports in the root directory.
+*   **Asset Paths**: Asset import paths have been corrected project-wide (`../assets` to `../../assets` or `../../../assets`) to ensure reliable resource bundling.
 *   **Expo Status**: This is a **Bare React Native** project (not Managed Expo), giving full control over native folders but requiring manual management of native dependencies and build scripts.

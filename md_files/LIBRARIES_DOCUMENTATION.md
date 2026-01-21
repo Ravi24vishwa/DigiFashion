@@ -28,7 +28,7 @@ This document lists the primary dependencies of the DigiFashion project and thei
 ## Utilities & Feedback
 
 *   **react-native-safe-area-context (5.6.2)**: A library for handling "safe area" insets (notches, status bars) on modern devices.
-*   **react-native-toast-message (2.3.3)**: A customizable toast notification component.
+*   **react-native-toast-message (2.3.3)**: A customizable toast notification component. **Crucial for providing feedback during cart operations, wishlist toggles, and checkout validation.**
 *   **react-native-popup-menu (0.18.0)**: Extensible popup menu for React Native.
 
 ## Developer Dependencies

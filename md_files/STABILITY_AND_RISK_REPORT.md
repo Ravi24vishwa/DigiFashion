@@ -16,7 +16,8 @@ This document identifies areas within the project that are sensitive to failure 
 *   **Risk**: React 19 introduced breaking changes in how certain internal hooks and refs work. Older libraries (like `react-native-responsive-dimensions` or `react-native-popup-menu`) might exhibit unexpected behavior or crashes if they rely on deprecated React features.
 
 ### 2. Async Data Streams
-*   **Risk**: Screens that trigger multiple async actions (Redux thunks + local API calls) are susceptible to race conditions. If a user navigates away from a screen before a fetch completes, a call to `setState` on an unmounted component or a stale data update could occur.
+*   **Risk**: Screens that trigger multiple async actions (Redux thunks + local API calls) are susceptible to race conditions. 
+*   **Mitigation (Jan 20, 2026)**: The "Favorites" flow has been migrated to **Optimistic UI**, drastically reducing the window for race conditions between successive toggle/fetch actions.
 
 ### 3. Deeply Nested Providers
 *   **Risk**: In `App.jsx`, there are 6+ nested providers. Each provider change can trigger a re-render down the entire tree. Combined with Redux updates, this can lead to "render loops" or performance degradation on lower-end devices.
