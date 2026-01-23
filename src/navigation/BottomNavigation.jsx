@@ -21,8 +21,12 @@ const TabIcon = React.memo(({ focused, activeIcon, inactiveIcon, label, iconStyl
   <View style={styles.tabItem}>
     {focused && <View style={styles.activeIndicator} />}
     <View style={[
-      styles.iconContainer,
-      { backgroundColor: focused ? '#5B6BEE' : 'transparent' }
+        styles.iconContainer,
+    {
+      backgroundColor: focused ? '#5B6BEE' : 'transparent',
+      width: focused ? 70 : 55,
+      height: focused ? 70 : 55,
+    },
     ]}>
       <Image
         source={focused ? activeIcon : inactiveIcon}
@@ -153,8 +157,6 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
   },
   iconContainer: {
-    width: 70,
-    height: 70,
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
@@ -166,7 +168,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   label: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '900',
     marginBottom: 32,
     width: 60,
