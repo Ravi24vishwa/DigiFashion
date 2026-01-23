@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React from 'react'
 import { RFValue } from "react-native-responsive-fontsize";
 import { responsiveWidth, responsiveHeight } from "react-native-responsive-dimensions";
-
+import Toast from "react-native-toast-message";
 const SignUpButton = (
     {
         title,
@@ -36,9 +36,9 @@ export default SignUpButton
 
 const styles = StyleSheet.create({
     ButtonList: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        alignItems: 'center',
+        // flex: 1,
+        // justifyContent: 'flex-end',
+        // alignItems: 'center',
     },
     signInBtn: {
         flexDirection: 'row',

@@ -1,36 +1,59 @@
-import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, Image, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image, Dimensions, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
 import React from 'react'
 import { RFValue } from "react-native-responsive-fontsize";
 import { responsiveWidth, responsiveHeight } from "react-native-responsive-dimensions";
 import HeaderTextBlock from '../../components/common/HeaderTextBlock'
-const { width, height } = Dimensions.get('screen');
+
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('screen');
 
 const IntroScreen = ({ navigation }) => {
     return (
-        <View style={styles.container}>
-            <ImageBackground
-                source={require('../../assets/images/SplashCleanBackground.png')}
-                style={styles.SplashImage}
-            >
-                <HeaderTextBlock
-                    title="Digi"
-                    boldPart="FASHION"
-                    subtitle={'Explore the new \nworld of Clothing'}
-                    subtitleStyle={{ fontSize: RFValue(26) }}
+        <View style={styles.outerContainer}>
+            {/* Fixed Background Image Layer */}
+            <View style={styles.backgroundContainer} pointerEvents="none">
+                <Image
+                    source={require('../../assets/images/SplashCleanBackground.png')}
+                    style={styles.bgImage}
+                    resizeMode="cover"
                 />
+            </View>
 
-                <TouchableOpacity
-                    style={styles.exploreButton}
-                    onPress={() => navigation.navigate('EmailVerificationScreen')}
+            <KeyboardAvoidingView
+                style={styles.container}
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+            >
+                <ScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                    bounces={false}
                 >
-                    <Text style={styles.exploreText}>Let's Explore</Text>
+                    <View style={styles.topSection}>
+                        <View style={styles.headerSection}>
+                            <HeaderTextBlock
+                                title="Digi"
+                                boldPart="FASHION"
+                                subtitle={'Explore the new \nworld of Clothing'}
+                                subtitleStyle={{ fontSize: RFValue(26) }}
+                            />
+                        </View>
+                    </View>
 
-                    <Image
-                        source={require('../../assets/icons/ExploreArrow.png')}
-                        style={styles.exploreIconImage}
-                    />
-                </TouchableOpacity>
-            </ImageBackground>
+                    <View style={styles.buttonSection}>
+                        <TouchableOpacity
+                            style={styles.exploreButton}
+                            onPress={() => navigation.navigate('EmailVerificationScreen')}
+                        >
+                            <Text style={styles.exploreText}>Let's Explore</Text>
+
+                            <Image
+                                source={require('../../assets/icons/ExploreArrow.png')}
+                                style={styles.exploreIconImage}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </View>
     )
 }
@@ -38,29 +61,44 @@ const IntroScreen = ({ navigation }) => {
 export default IntroScreen;
 
 const styles = StyleSheet.create({
+    outerContainer: {
+        flex: 1,
+        backgroundColor: '#000',
+    },
+    backgroundContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT,
+    },
+    bgImage: {
+        width: '100%',
+        height: '100%',
+    },
     container: {
         flex: 1,
     },
-    SplashImage: {
+    scrollContent: {
+        flexGrow: 1,
+        minHeight: SCREEN_HEIGHT,
+        paddingBottom: responsiveHeight(8),
+    },
+    topSection: {
         width: '100%',
-        height: '100%',
-        justifyContent: 'flex-start',
+        flex: 1,
+    },
+    headerSection: {
+        width: '100%',
         alignItems: 'center',
+        marginTop: responsiveHeight(12),
     },
-    FirstHeader: {
-        width: '80%',
-        alignItems: 'flex-start',
-        marginTop: responsiveHeight(23),
-    },
-    FirstHeadertxt: {
-        color: 'white',
-        fontSize: RFValue(48),
-        marginVertical: responsiveHeight(2),
-    },
-    SecondHeardtxt: {
-        color: 'white',
-        fontSize: RFValue(26),
-        textAlign: 'left',
+    buttonSection: {
+        alignItems: 'center',
+        marginTop: 'auto',
+        paddingTop: responsiveHeight(5),
     },
     exploreButton: {
         backgroundColor: 'white',
@@ -71,7 +109,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         flexDirection: 'row',
         paddingHorizontal: responsiveWidth(10),
-        marginTop: responsiveHeight(49),
     },
     exploreText: {
         color: 'black',
