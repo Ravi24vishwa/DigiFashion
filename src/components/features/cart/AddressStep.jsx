@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { EMPTY_ADDRESS } from '../../../constants';
 
 const AddressStep = ({
     addresses,
@@ -28,7 +29,6 @@ const AddressStep = ({
         if (!addressForm.address_line_1.trim()) newErrors.address_line_1 = 'Flat/HouseNo/Building is required';
         if (!addressForm.address_line_2.trim()) newErrors.address_line_2 = 'Street Address  is required';
         if (!addressForm.city.trim()) newErrors.city = 'City is required';
-        if (!addressForm.state.trim()) newErrors.state = 'State is required';
         if (!addressForm.pincode.trim()) newErrors.pincode = 'Pincode is required';
         else if (!/^\d{6}$/.test(addressForm.pincode)) newErrors.pincode = 'Pincode must be 6 digits';
         if (!addressForm.name.trim()) newErrors.name = 'Name is required';
@@ -39,6 +39,9 @@ const AddressStep = ({
     };
 
     const handleEdit = (item) => {
+
+        let convertedPincode = item.pincode ? item.pincode.toString() : '';
+
         setAddressForm({
             id: item.id,
             // title: item.title || '',
@@ -46,8 +49,7 @@ const AddressStep = ({
             address_line_2: item.address_line_2 || '',
             address_line_1: item.address_line_1 || '',
             city: item.city || '',
-            state: item.state || '',
-            pincode: item.pincode || '',
+            pincode: convertedPincode || '',
             name: item.name || '',
             phone_no: item.phone_no || '',
             default: item.default || 0
@@ -57,28 +59,20 @@ const AddressStep = ({
     };
 
     const handleAddNew = () => {
-        setAddressForm({
-            id: null,
-            // title: '',
-            address_type: 'home',
-            address_line_2: '',
-            address_line_1: '',
-            city: '',
-            state: '',
-            pincode: '',
-            name: '',
-            phone_no: '',
-            default: 0
-        });
+        setAddressForm(EMPTY_ADDRESS);
         setErrors({});
         setShowForm(true);
     };
 
     const onSaveInternal = async () => {
-        if (!validateForm()) return;
+        try {
+            if (!validateForm()) return;
         const success = await onSaveAddress();
         if (success) {
             setShowForm(false);
+        }
+        } catch (error) {
+            console.error('Save address error:', error);
         }
     };
 
@@ -144,15 +138,6 @@ const AddressStep = ({
             )}
             {(showForm || addresses.length === 0) && (
                 <View style={styles.formContainer}>
-                    {/* <Text style={styles.sectionTitle}>{addressForm.id ? 'Edit Address' : 'Add New Address'}</Text>
-                    <TextInput
-                        style={[styles.inputField, errors.title && styles.errorInput]}
-                        placeholder="Address Title (e.g. Home, Office)"
-                        placeholderTextColor="#999"
-                        value={addressForm.title}
-                        onChangeText={(val) => setAddressForm({ ...addressForm, title: val })}
-                    /> */}
-                    {/* {errors.title && <Text style={styles.errorText}>{errors.title}</Text>} */}
                     <View style={styles.typeContainer}>
                         {['home', 'office', 'other'].map((type) => (
                             <TouchableOpacity
@@ -210,14 +195,6 @@ const AddressStep = ({
                             {errors.pincode && <Text style={styles.errorText}>{errors.pincode}</Text>}
                         </View>
                     </View>
-                    <TextInput
-                        style={[styles.inputField, errors.state && styles.errorInput]}
-                        placeholder="State"
-                        placeholderTextColor="#999"
-                        value={addressForm.state}
-                        onChangeText={(val) => setAddressForm({ ...addressForm, state: val })}
-                    />
-                    {errors.state && <Text style={styles.errorText}>{errors.state}</Text>}
 
                     <View style={styles.contactHeader}>
                         <Image source={require('./../../../assets/icons/Call.png')} style={styles.contactIcon} />

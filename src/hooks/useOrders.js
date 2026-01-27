@@ -10,8 +10,9 @@ export const useOrders = () => {
         setIsLoading(true);
         setError(null);
         try {
+            console.log('OrderScreen: Initiating fetchOrders API request');
             const res = await orderService.getOrders();
-            console.log('response of order list fetch ------->', res)
+            console.log('OrderScreen: fetchOrders API request successful, response:', res);
             // Map API response to UI model if needed
             // The API returns orders in res.Data or res.data
             const orderList = res.Data.orders || [];
@@ -28,6 +29,7 @@ export const useOrders = () => {
                 items: order.order_items || []
             })));
         } catch (err) {
+            console.error('OrderScreen: fetchOrders API request failed:', err.message, err);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -37,9 +39,12 @@ export const useOrders = () => {
     const fetchOrderDetails = async (orderId) => {
         setIsLoading(true);
         try {
+            console.log('OrderScreen: Initiating fetchOrderDetails API request for orderId:', orderId);
             const res = await orderService.getOrderDetails(orderId);
+            console.log('OrderScreen: fetchOrderDetails API request successful for orderId:', orderId, 'response:', res);
             return res.Data || res.data;
         } catch (err) {
+            console.error('OrderScreen: fetchOrderDetails API request failed for orderId:', orderId, 'error:', err.message, err);
             setError(err.message);
             throw err;
         } finally {
