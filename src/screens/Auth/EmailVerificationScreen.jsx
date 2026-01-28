@@ -78,6 +78,11 @@ const EmailVerificationScreen = ({ navigation }) => {
             console.log('onGoogleButtonPress --------------###########>')
             setLocalLoading(true);
             await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+            // Sign out first to force account picker to show
+            // This ensures users can manually choose their Google account
+            await GoogleSignin.signOut();
+
             const signInResult = await GoogleSignin.signIn();
             const idToken = signInResult?.data.idToken;
             console.log('idToken----+++++++++>', signInResult)

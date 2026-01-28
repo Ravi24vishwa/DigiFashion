@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "612975934664-u1tqv4b4nqvm9e8s06t0vca9081k5r1d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.digifashion",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "612975934664-agpmvj7u3hgdpbd9r97gt4o31h7o0q1u.apps.googleusercontent.com",
           "client_type": 3
         }
