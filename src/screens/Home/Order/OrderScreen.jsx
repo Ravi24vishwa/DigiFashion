@@ -26,6 +26,7 @@ const OrderScreen = ({ navigation }) => {
   const filterOptions = ['All', 'Ordered', 'Shipped', 'Delivered', 'Cancelled', 'Exchange', 'Return',];
 
   useEffect(() => {
+    console.log('OrderScreen: Component mounted, initiating orders fetch');
     fetchOrders();
   }, [fetchOrders]);
 
@@ -139,7 +140,10 @@ const OrderScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
           refreshing={isLoading}
-          onRefresh={fetchOrders}
+          onRefresh={() => {
+            console.log('OrderScreen: Pull to refresh initiated');
+            fetchOrders();
+          }}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Image

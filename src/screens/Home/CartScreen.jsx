@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, FlatList, SafeAreaView, StatusBar } from 'react-native';
 import { CommonHeader } from '../../components/layout/CommonHeader';
 import { useCart, useAppUI, useCheckout } from '../../hooks';
+import { EMPTY_ADDRESS } from '../../constants';
 
 // Extracted Components
 import CartStepper from '../../components/features/cart/CartStepper';
@@ -41,19 +42,7 @@ const CartScreen = ({ navigation }) => {
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
   // Address Form State
-  const [addressForm, setAddressForm] = useState({
-    id: null,
-    title: '',
-    address_type: 'home',
-    address_line_1: '',
-    address_line_2: '',
-    city: '',
-    state: '',
-    pincode: '',
-    name: '',
-    phone_no: '',
-    default: 0
-  });
+  const [addressForm, setAddressForm] = useState(EMPTY_ADDRESS);
 
   // Payment State
   const [selectedPayment, setSelectedPayment] = useState('');
@@ -67,19 +56,7 @@ const CartScreen = ({ navigation }) => {
     try {
       const res = await saveAddress(addressForm);
       if (res) {
-        setAddressForm({
-          id: null,
-          title: '',
-          address_type: 'home',
-          address_line_1: '',
-          address_line_2: '',
-          city: '',
-          state: '',
-          pincode: '',
-          name: '',
-          phone_no: '',
-          default: 0
-        });
+        setAddressForm(EMPTY_ADDRESS);
         return true;
       }
       return false;
@@ -132,38 +109,6 @@ const CartScreen = ({ navigation }) => {
     setCurrentStep(1); // Reset internal state
     navigation.navigate('HomeTab');
   };
-
-  // const handlePlaceOrder = async () => {
-  //   try {
-  //     // Prepare order data as per API
-  //     const orderData = {
-  //       payment_option: selectedPayment.toLowerCase(),
-  //       // store_id: cartItems[0]?.shop_id || 1,
-  //     };
-
-  //     const res = await submitOrder(orderData);
-  //     if (res.Status === 200) {
-  //       console.log('response of order or submit order', res)
-  //       Toast.show({
-  //         type: 'success',
-  //         text1: 'Order',
-  //         text2: res.Message,
-  //       });
-  //       clearCart();
-  //       setCurrentStep(4);
-  //     }
-  //     else {
-  //       console.log('response of order or submit order', res)
-  //       Toast.show({
-  //         type: 'info',
-  //         text1: 'Order',
-  //         text2: res.Message,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error('Order Submission Error:', error);
-  //   }
-  // };
 
   const handlePlaceOrder = async () => {
     // ❌ STOP if payment not selected

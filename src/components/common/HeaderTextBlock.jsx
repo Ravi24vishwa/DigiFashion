@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
     container: {
         width: '80%',
         alignItems: 'flex-start',
-        marginTop: responsiveHeight(20),
     },
     title: {
         color: 'white',

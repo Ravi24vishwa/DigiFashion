@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { EMPTY_ADDRESS } from '../../../constants';
 
 const AddressStep = ({
     addresses,
@@ -12,6 +13,7 @@ const AddressStep = ({
 }) => {
     const [showForm, setShowForm] = useState(addresses.length === 0);
     const [IsAddressSelected, setIsAddressSelected] = useState(false)
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (addresses.length > 0) {
@@ -21,44 +23,56 @@ const AddressStep = ({
         }
     }, [addresses.length]);
 
+    const validateForm = () => {
+        let newErrors = {};
+        // if (!addressForm.title.trim()) newErrors.title = 'Title is required';
+        if (!addressForm.address_line_1.trim()) newErrors.address_line_1 = 'Flat/HouseNo/Building is required';
+        if (!addressForm.address_line_2.trim()) newErrors.address_line_2 = 'Street Address  is required';
+        if (!addressForm.city.trim()) newErrors.city = 'City is required';
+        if (!addressForm.pincode.trim()) newErrors.pincode = 'Pincode is required';
+        else if (!/^\d{6}$/.test(addressForm.pincode)) newErrors.pincode = 'Pincode must be 6 digits';
+        if (!addressForm.name.trim()) newErrors.name = 'Name is required';
+        if (!addressForm.phone_no.trim()) newErrors.phone_no = 'Phone number is required';
+        else if (!/^\d{10}$/.test(addressForm.phone_no)) newErrors.phone_no = 'Phone number must be 10 digits';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleEdit = (item) => {
+
+        let convertedPincode = item.pincode ? item.pincode.toString() : '';
+
         setAddressForm({
             id: item.id,
-            title: item.title || '',
+            // title: item.title || '',
             address_type: item.address_type || 'home',
-            address_line_1: item.address_line_1 || '',
             address_line_2: item.address_line_2 || '',
+            address_line_1: item.address_line_1 || '',
             city: item.city || '',
-            state: item.state || '',
-            pincode: item.pincode || '',
+            pincode: convertedPincode || '',
             name: item.name || '',
             phone_no: item.phone_no || '',
             default: item.default || 0
         });
+        setErrors({});
         setShowForm(true);
     };
 
     const handleAddNew = () => {
-        setAddressForm({
-            id: null,
-            title: '',
-            address_type: 'home',
-            address_line_1: '',
-            address_line_2: '',
-            city: '',
-            state: '',
-            pincode: '',
-            name: '',
-            phone_no: '',
-            default: 0
-        });
+        setAddressForm(EMPTY_ADDRESS);
+        setErrors({});
         setShowForm(true);
     };
 
     const onSaveInternal = async () => {
+        try {
+            if (!validateForm()) return;
         const success = await onSaveAddress();
         if (success) {
             setShowForm(false);
+        }
+        } catch (error) {
+            console.error('Save address error:', error);
         }
     };
 
@@ -89,7 +103,7 @@ const AddressStep = ({
                 </View>
             </View>
             <Text style={styles.addressName}>{item.title || 'Shipping Address'}</Text>
-            <Text style={styles.addressText}>{item.address_line_1}{item.address_line_2 ? `, ${item.address_line_2}` : ''}</Text>
+            <Text style={styles.addressText}>{item.address_line_2}{item.address_line_1 ? `, ${item.address_line_1}` : ''}</Text>
             <Text style={styles.addressText}>{item.city}, {item.pincode}</Text>
             <Text style={styles.addressText}>{item.name} | {item.phone_no}</Text>
         </TouchableOpacity>
@@ -124,14 +138,6 @@ const AddressStep = ({
             )}
             {(showForm || addresses.length === 0) && (
                 <View style={styles.formContainer}>
-                    <Text style={styles.sectionTitle}>{addressForm.id ? 'Edit Address' : 'Add New Address'}</Text>
-                    <TextInput
-                        style={styles.inputField}
-                        placeholder="Address Title (e.g. Home, Office)"
-                        placeholderTextColor="#999"
-                        value={addressForm.title}
-                        onChangeText={(val) => setAddressForm({ ...addressForm, title: val })}
-                    />
                     <View style={styles.typeContainer}>
                         {['home', 'office', 'other'].map((type) => (
                             <TouchableOpacity
@@ -150,44 +156,45 @@ const AddressStep = ({
                         ))}
                     </View>
                     <TextInput
-                        style={styles.inputField}
+                        style={[styles.inputField, errors.address_line_1 && styles.errorInput]}
                         placeholder="Flat/House No/Building"
-                        placeholderTextColor="#999"
-                        value={addressForm.address_line_2}
-                        onChangeText={(val) => setAddressForm({ ...addressForm, address_line_2: val })}
-                    />
-                    <TextInput
-                        style={styles.inputField}
-                        placeholder="Street Address / Landmark"
                         placeholderTextColor="#999"
                         value={addressForm.address_line_1}
                         onChangeText={(val) => setAddressForm({ ...addressForm, address_line_1: val })}
                     />
-                    <View style={styles.row}>
-                        <TextInput
-                            style={[styles.inputField, { flex: 1, marginRight: 10 }]}
-                            placeholder="City"
-                            placeholderTextColor="#999"
-                            value={addressForm.city}
-                            onChangeText={(val) => setAddressForm({ ...addressForm, city: val })}
-                        />
-                        <TextInput
-                            style={[styles.inputField, { flex: 1 }]}
-                            placeholder="Pincode"
-                            placeholderTextColor="#999"
-                            keyboardType="numeric"
-                            maxLength={6}
-                            value={addressForm.pincode}
-                            onChangeText={(val) => setAddressForm({ ...addressForm, pincode: val })}
-                        />
-                    </View>
+                    {errors.address_line_1 && <Text style={styles.errorText}>{errors.address_line_1}</Text>}
                     <TextInput
-                        style={styles.inputField}
-                        placeholder="State"
+                        style={[styles.inputField, errors.address_line_2 && styles.errorInput]}
+                        placeholder="Street Address / Landmark"
                         placeholderTextColor="#999"
-                        value={addressForm.state}
-                        onChangeText={(val) => setAddressForm({ ...addressForm, state: val })}
+                        value={addressForm.address_line_2}
+                        onChangeText={(val) => setAddressForm({ ...addressForm, address_line_2: val })}
                     />
+                    {errors.address_line_2 && <Text style={styles.errorText}>{errors.address_line_2}</Text>}
+                    <View style={styles.row}>
+                        <View style={{ flex: 1, marginRight: 10 }}>
+                            <TextInput
+                                style={[styles.inputField, errors.city && styles.errorInput]}
+                                placeholder="City"
+                                placeholderTextColor="#999"
+                                value={addressForm.city}
+                                onChangeText={(val) => setAddressForm({ ...addressForm, city: val })}
+                            />
+                            {errors.city && <Text style={styles.errorText}>{errors.city}</Text>}
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <TextInput
+                                style={[styles.inputField, errors.pincode && styles.errorInput]}
+                                placeholder="Pincode"
+                                placeholderTextColor="#999"
+                                keyboardType="numeric"
+                                maxLength={6}
+                                value={addressForm.pincode}
+                                onChangeText={(val) => setAddressForm({ ...addressForm, pincode: val })}
+                            />
+                            {errors.pincode && <Text style={styles.errorText}>{errors.pincode}</Text>}
+                        </View>
+                    </View>
 
                     <View style={styles.contactHeader}>
                         <Image source={require('./../../../assets/icons/Call.png')} style={styles.contactIcon} />
@@ -195,22 +202,28 @@ const AddressStep = ({
                     </View>
 
                     <View style={styles.contactRow}>
-                        <TextInput
-                            style={[styles.inputField, { flex: 1, marginRight: 10 }]}
-                            placeholder="Name"
-                            placeholderTextColor="#999"
-                            value={addressForm.name}
-                            onChangeText={(val) => setAddressForm({ ...addressForm, name: val })}
-                        />
-                        <TextInput
-                            style={[styles.inputField, { flex: 1 }]}
-                            placeholder="Contact Number"
-                            placeholderTextColor="#999"
-                            keyboardType="phone-pad"
-                            maxLength={10}
-                            value={addressForm.phone_no}
-                            onChangeText={(val) => setAddressForm({ ...addressForm, phone_no: val })}
-                        />
+                        <View style={{ flex: 1, marginRight: 10 }}>
+                            <TextInput
+                                style={[styles.inputField, errors.name && styles.errorInput]}
+                                placeholder="Name"
+                                placeholderTextColor="#999"
+                                value={addressForm.name}
+                                onChangeText={(val) => setAddressForm({ ...addressForm, name: val })}
+                            />
+                            {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <TextInput
+                                style={[styles.inputField, errors.phone_no && styles.errorInput]}
+                                placeholder="Contact Number"
+                                placeholderTextColor="#999"
+                                keyboardType="phone-pad"
+                                maxLength={10}
+                                value={addressForm.phone_no}
+                                onChangeText={(val) => setAddressForm({ ...addressForm, phone_no: val })}
+                            />
+                            {errors.phone_no && <Text style={styles.errorText}>{errors.phone_no}</Text>}
+                        </View>
                     </View>
 
                     <View style={styles.formActions}>
@@ -321,7 +334,7 @@ const styles = StyleSheet.create({
         padding: 16,
         fontSize: 14,
         color: '#333',
-        marginBottom: 16,
+        marginBottom: 5,
         borderWidth: 1,
         borderColor: '#f0f0f0',
     },
@@ -402,6 +415,14 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         color: '#9CA3AF',
         fontWeight: '600',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 12,
+        marginBottom: 10,
+    },
+    errorInput: {
+        borderColor: 'red',
     },
 });
 

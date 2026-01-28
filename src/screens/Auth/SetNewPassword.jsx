@@ -12,6 +12,7 @@ import {
     Dimensions
 } from "react-native";
 import React, { useState } from "react";
+import Toast from "react-native-toast-message";
 import { RFValue } from "react-native-responsive-fontsize";
 import {
     responsiveWidth,
@@ -19,6 +20,8 @@ import {
 } from "react-native-responsive-dimensions";
 import SignUpButton from '../../components/common/SignUpButton';
 import HeaderTextBlock from "../../components/common/HeaderTextBlock";
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('screen');
+
 const SetNewPassword = ({ navigation, route }) => {
     const { email } = route.params || {};
     const [password, setPassword] = useState('');
@@ -26,97 +29,111 @@ const SetNewPassword = ({ navigation, route }) => {
 
     const handleSavePassword = () => {
         if (!password.trim() || !confirmPassword.trim()) {
-            alert("Please enter both passwords");
+            // alert("Please enter both passwords");
+             Toast.show
+                        ({
+                            type: 'error',
+                            text1: 'Error',
+                            text2: 'Please enter both passwords'
+                        });
             return;
         }
         if (password !== confirmPassword) {
-            alert("Passwords do not match");
+            // alert("Passwords do not match");
+             Toast.show
+            ({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Passwords do not match'
+            });
             return;
         }
-        // Save password logic here
-        alert("Password saved successfully");
-        navigation.navigate('SignIn');
+        // alert("Password saved successfully");
+         Toast.show
+            ({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Password saved successfully'
+            });
+        navigation.navigate('SignInScreen');
     }
     return (
-        <View style={styles.container}>
-            <ImageBackground
-                source={require("../../assets/images/SetNewPasswordScreen.png")}
-                style={styles.bgImage}
-                resizeMode="cover"
-            />
+        <View style={styles.outerContainer}>
+            {/* Fixed Background Image Layer */}
+            <View style={styles.backgroundContainer} pointerEvents="none">
+                <Image
+                    source={require("../../assets/images/SetNewPasswordScreen.png")}
+                    style={styles.bgImage}
+                    resizeMode="cover"
+                />
+            </View>
             <KeyboardAvoidingView
-                style={{ flex: 1 }}
+                style={styles.container}
                 behavior={Platform.OS === "ios" ? "padding" : undefined}
             >
-
                 <ScrollView
-                    contentContainerStyle={{ flexGrow: 1 }}
+                    contentContainerStyle={styles.scrollContent}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
+                    bounces={false}
                 >
-                    <View style={styles.BackArrowBtnContainer}>
-                        <TouchableOpacity
-                            style={styles.skipButton}
-                            // onPress={() => navigation.navigate("VerifyOTPScreen")}
-                            onPress={() => console.log('navigate to new pass screen')}
-                        >
-                            <Image
-                                source={require('../../assets/icons/Back.png')}
-                                style={styles.ArrowStyle}
-                            />
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* Header */}
-
-                    <HeaderTextBlock
-                        title="Digi"
-                        boldPart="FASHION"
-                        subtitle={'Set New Password'}
-                        containerStyle={{ marginLeft: responsiveWidth(9), marginBottom: responsiveHeight(4) }}
-                        subtitleStyle={{ fontSize: RFValue(32), fontWeight: '700' }}
-                    />
-
-                    {/* Input Fields */}
-                    <View style={styles.formInputFields}>
-                        {/* Email Field */}
-                        <View style={styles.inputWrapper}>
-                            <Image
-                                source={require("../../assets/icons/PasswordLock.png")}
-                                style={styles.inputIcon}
-                            />
-                            <TextInput
-                                placeholder="Enter New Password"
-                                placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
-                                keyboardType="visible-password"
-                                secureTextEntry
-                                value={password}
-                                onChangeText={setPassword}
-                            />
+                    <View style={styles.topSection}>
+                        <View style={styles.navButtons}>
+                            <TouchableOpacity
+                                style={styles.navButton}
+                                onPress={() => navigation.pop()}
+                            >
+                                <Image
+                                    source={require('../../assets/icons/Back.png')}
+                                    style={styles.ArrowStyle}
+                                />
+                            </TouchableOpacity>
                         </View>
-                        {/* Confirm Password Field */}
-                        <View style={styles.inputWrapper}>
-                            <Image
-                                source={require("../../assets/icons/PasswordLock.png")}
-                                style={styles.inputIcon}
-                            />
-                            <TextInput
-                                placeholder="Confirm Password"
-                                placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
-                                keyboardType="visible-password"
-                                secureTextEntry
-                                value={confirmPassword}
-                                onChangeText={setConfirmPassword}
-                            />
+
+                        <HeaderTextBlock
+                            title="Digi"
+                            boldPart="FASHION"
+                            subtitle={'Set New Password'}
+                            containerStyle={{ marginLeft: responsiveWidth(9), marginTop: responsiveHeight(5) }}
+                            subtitleStyle={{ fontSize: RFValue(32), fontWeight: '700' }}
+                        />
+
+                        <View style={styles.formInputFields}>
+                            <View style={styles.inputWrapper}>
+                                <Image
+                                    source={require("../../assets/icons/PasswordLock.png")}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    placeholder="Enter New Password"
+                                    placeholderTextColor="rgba(255,255,255,0.7)"
+                                    style={styles.SignInInputFields}
+                                    keyboardType="visible-password"
+                                    secureTextEntry
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
+                            </View>
+                            <View style={styles.inputWrapper}>
+                                <Image
+                                    source={require("../../assets/icons/PasswordLock.png")}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    placeholder="Confirm Password"
+                                    placeholderTextColor="rgba(255,255,255,0.7)"
+                                    style={styles.SignInInputFields}
+                                    keyboardType="visible-password"
+                                    secureTextEntry
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                />
+                            </View>
                         </View>
                     </View>
 
-                    {/* Buttons */}
-                    <View style={styles.buttonContainer}>
-                       
-                         <SignUpButton
+                    <View style={styles.buttonSection}>
+                        <SignUpButton
                             title={'Save'}
                             onPress={handleSavePassword}
                         />
@@ -127,65 +144,70 @@ const SetNewPassword = ({ navigation, route }) => {
     );
 };
 
-
 export default SetNewPassword;
 
 const styles = StyleSheet.create({
-    container: {
+    outerContainer: {
         flex: 1,
         backgroundColor: '#000'
     },
-
-    bgImage: {
+    backgroundContainer: {
         position: 'absolute',
         top: 0,
-        bottom: 0,
-        right: 0,
         left: 0,
-        height: Dimensions.get('screen').height,
+        right: 0,
+        bottom: 0,
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT,
     },
-
-    BackArrowBtnContainer: {
-        top: responsiveHeight(5),
-        flexDirection: 'row',
-        marginHorizontal: 20,
-        height: responsiveHeight(2),
+    bgImage: {
+        width: '100%',
+        height: '100%',
     },
-
-    skipButton: {
-        flexDirection: "row",
-        alignItems: "center",
+    container: {
+        flex: 1,
     },
-
+    scrollContent: {
+        flexGrow: 1,
+        minHeight: SCREEN_HEIGHT,
+        paddingBottom: responsiveHeight(8),
+    },
+    topSection: {
+        width: '100%',
+        flex: 1,
+    },
+    navButtons: {
+        paddingHorizontal: responsiveWidth(5),
+        marginTop: responsiveHeight(2),
+    },
+    navButton: {
+        padding: 10,
+    },
     ArrowStyle: {
-        height: 26,
-        width: 26,
+        height: responsiveHeight(2),
+        width: responsiveWidth(4),
+        resizeMode: 'contain',
         tintColor: 'white'
     },
-
-    /* Input Fields */
     formInputFields: {
-        marginTop: 30,
-        gap: 23,
+        marginTop: responsiveHeight(5),
+        gap: responsiveHeight(2.5),
     },
-
     inputWrapper: {
         flexDirection: "row",
         alignItems: "center",
-        width: responsiveWidth(74),
+        width: responsiveWidth(82),
         alignSelf: "center",
         borderBottomWidth: 2,
         borderBottomColor: "white",
-        paddingBottom: responsiveHeight(0.2),
+        paddingBottom: responsiveHeight(0.5),
     },
-
     inputIcon: {
         width: responsiveWidth(6),
         height: responsiveWidth(6),
         resizeMode: "contain",
         tintColor: "white",
     },
-
     SignInInputFields: {
         flex: 1,
         paddingLeft: 10,
@@ -193,16 +215,10 @@ const styles = StyleSheet.create({
         fontSize: RFValue(16),
         fontWeight: "400",
     },
-
-    /* Buttons */
-    buttonContainer: {
+    buttonSection: {
         alignItems: "center",
-        marginTop: responsiveHeight(12),
-    },
-
-    SendBtn: {
-        marginBottom: "4%",
-        fontWeight: '600'
+        marginTop: 'auto',
+        paddingTop: responsiveHeight(5),
     },
 });
 

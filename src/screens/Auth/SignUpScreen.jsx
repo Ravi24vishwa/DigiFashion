@@ -20,6 +20,8 @@ import { verifyOtp } from '../../store/slices/authSlice';
 import Toast from 'react-native-toast-message';
 import SignUpButton from "../../components/common/SignUpButton";
 
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('screen');
+
 const SignUpScreen = ({ navigation, route }) => {
     const dispatch = useDispatch();
     const { email: initialEmail } = route.params || {};
@@ -44,15 +46,6 @@ const SignUpScreen = ({ navigation, route }) => {
     }, [receivedOtp]);
 
     const handleSignUp = async () => {
-        const data = {
-            name1: name,
-            email1: email,
-            password1: password,
-            otpCode1: otpCode,
-            phoneNumber1: phoneNumber
-        }
-        console.log('-------------------> data ', data)
-
         if (!name || !email || !password || !otpCode || !phoneNumber) {
             alert("Please fill all fields");
             return;
@@ -64,173 +57,165 @@ const SignUpScreen = ({ navigation, route }) => {
             otp: otpCode
         }));
 
-        if (verifyOtp.fulfilled.match(resultAction)) {
-            // Navigation to 'Main' is handled automatically by MainNavigation when token is set
-
-        } else {
+        if (!verifyOtp.fulfilled.match(resultAction)) {
             const errorMessage = resultAction.payload?.message || "Verification failed";
             alert(errorMessage);
         }
     };
 
     return (
-        <View style={styles.container}>
-            <ImageBackground
-                source={require("../../assets/images/SignUpScreen.png")}
-                style={styles.bgImage}
-                resizeMode="cover"
-            />
+        <View style={styles.outerContainer}>
+            {/* Fixed Background Image Layer */}
+            <View style={styles.backgroundContainer} pointerEvents="none">
+                <Image
+                    source={require("../../assets/images/SignUpScreen.png")}
+                    style={styles.bgImage}
+                    resizeMode="cover"
+                />
+            </View>
 
             <KeyboardAvoidingView
-                style={{ flex: 1 }}
+                style={styles.container}
                 behavior={Platform.OS === "ios" ? "padding" : undefined}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
             >
                 <ScrollView
-                    contentContainerStyle={{ flexGrow: 1 }}
+                    contentContainerStyle={styles.scrollContent}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
+                    bounces={false}
                 >
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 20 }}>
-                        <TouchableOpacity
-                            style={styles.skipButton}
-                            onPress={() => navigation.replace("EmailVerificationScreen")}
-                        >
-                            <Image
-                                source={require('../../assets/icons/Back.png')}
-                                style={styles.ArrowStyle}
-                            />
-                        </TouchableOpacity>
-                        {/* Skip Button */}
-                        <TouchableOpacity
-                            style={styles.skipButton}
-                            onPress={() => navigation.replace("SignInScreen")}
-                        >
-                            <Text style={styles.skipText}>Skip{" "}</Text>
-                            <Image
-                                source={require('../../assets/icons/Forward.png')}
-                                style={styles.ArrowStyle}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                    {/* Header */}
-
-                    <HeaderTextBlock
-                        title="Digi"
-                        boldPart="FASHION"
-                        subtitle={'Create Account'}
-                        containerStyle={{ marginLeft: responsiveWidth(9), marginTop: responsiveHeight(15) }}
-                        subtitleStyle={{ fontSize: RFValue(26), fontWeight: '700' }}
-                    />
-
-                    {/* Input Fields */}
-                    <View style={styles.formInputFields}>
-                        {/* Full Name Field */}
-                        <View style={styles.inputWrapper}>
-                            <Image
-                                source={require("../../assets/icons/User.png")}
-                                style={styles.inputIcon}
-                            />
-                            <TextInput
-                                placeholder="Full Name"
-                                placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
-                                keyboardType="default"
-                                value={name}
-                                onChangeText={setName}
-                            />
-                        </View>
-                        {/* Email Field */}
-                        <View style={styles.inputWrapper}>
-                            <Image
-                                source={require("../../assets/icons/Email.png")}
-                                style={styles.inputIcon}
-                            />
-                            <TextInput
-                                placeholder="Email"
-                                placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                value={email}
-                                onChangeText={setEmail}
-                            />
-                        </View>
-                        {/* PhoneNumber Field */}
-                        <View style={styles.inputWrapper}>
-                            <Image
-                                source={require("../../assets/icons/User.png")}
-                                style={styles.inputIcon}
-                            />
-                            <TextInput
-                                placeholder="Phone Number"
-                                placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
-                                keyboardType="phone-pad"
-                                value={phoneNumber}
-                                onChangeText={setPhoneNumber}
-                                maxLength={10}
-                            />
-                        </View>
-
-                        {/* Password Field */}
-                        <View style={styles.inputWrapper}>
-                            <Image
-                                source={require("../../assets/icons/PasswordLock.png")}
-                                style={styles.inputIcon}
-                            />
-                            <TextInput
-                                placeholder="Password"
-                                placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
-                                secureTextEntry={!showPassword}
-                                value={password}
-                                onChangeText={setPassword}
-                                maxLength={10}
-                            />
+                    <View style={styles.topSection}>
+                        <View style={styles.navButtons}>
                             <TouchableOpacity
-                                onPress={() => setShowPassword(!showPassword)}
+                                style={styles.navButton}
+                                onPress={() => navigation.replace("EmailVerificationScreen")}
                             >
-                                <View style={styles.EyeIconSpace}>
-                                    <Image
-                                        source={
-                                            showPassword
-                                                ? require("../../assets/icons/Show.png")
-                                                : require("../../assets/icons/Hide.png")
-                                        }
-                                        style={styles.passwordicon}
-                                    />
-                                </View>
+                                <Image
+                                    source={require('../../assets/icons/Back.png')}
+                                    style={styles.ArrowStyle}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.navButton}
+                                onPress={() => navigation.replace("SignInScreen")}
+                            >
+                                <Text style={styles.skipText}>Skip{" "}</Text>
+                                <Image
+                                    source={require('../../assets/icons/Forward.png')}
+                                    style={styles.ArrowStyle}
+                                />
                             </TouchableOpacity>
                         </View>
-                        {/* OTP Field */}
-                        <View style={styles.inputWrapper}>
-                            <Image
-                                source={require("../../assets/icons/User.png")}
-                                style={styles.inputIcon}
-                            />
-                            <TextInput
-                                placeholder="OTP"
-                                placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
-                                keyboardType="number-pad"
-                                value={otpCode}
-                                onChangeText={setOtpCode}
-                            />
+
+                        <HeaderTextBlock
+                            title="Digi"
+                            boldPart="FASHION"
+                            subtitle={'Create Account'}
+                            containerStyle={{ marginLeft: responsiveWidth(9), marginTop: responsiveHeight(8) }}
+                            subtitleStyle={{ fontSize: RFValue(26), fontWeight: '700' }}
+                        />
+
+                        <View style={styles.formInputFields}>
+                            <View style={styles.inputWrapper}>
+                                <Image
+                                    source={require("../../assets/icons/User.png")}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    placeholder="Full Name"
+                                    placeholderTextColor="rgba(255,255,255,0.7)"
+                                    style={styles.SignInInputFields}
+                                    keyboardType="default"
+                                    value={name}
+                                    onChangeText={setName}
+                                />
+                            </View>
+                            <View style={styles.inputWrapper}>
+                                <Image
+                                    source={require("../../assets/icons/Email.png")}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    placeholder="Email"
+                                    placeholderTextColor="rgba(255,255,255,0.7)"
+                                    style={styles.SignInInputFields}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                />
+                            </View>
+                            <View style={styles.inputWrapper}>
+                                <Image
+                                    source={require("../../assets/icons/User.png")}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    placeholder="Phone Number"
+                                    placeholderTextColor="rgba(255,255,255,0.7)"
+                                    style={styles.SignInInputFields}
+                                    keyboardType="phone-pad"
+                                    value={phoneNumber}
+                                    onChangeText={setPhoneNumber}
+                                    maxLength={10}
+                                />
+                            </View>
+
+                            <View style={styles.inputWrapper}>
+                                <Image
+                                    source={require("../../assets/icons/PasswordLock.png")}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    placeholder="Password"
+                                    placeholderTextColor="rgba(255,255,255,0.7)"
+                                    style={styles.SignInInputFields}
+                                    secureTextEntry={!showPassword}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
+                                <TouchableOpacity
+                                    onPress={() => setShowPassword(!showPassword)}
+                                >
+                                    <View style={styles.EyeIconSpace}>
+                                        <Image
+                                            source={
+                                                showPassword
+                                                    ? require("../../assets/icons/Show.png")
+                                                    : require("../../assets/icons/Hide.png")
+                                            }
+                                            style={styles.passwordicon}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.inputWrapper}>
+                                <Image
+                                    source={require("../../assets/icons/User.png")}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    placeholder="OTP"
+                                    placeholderTextColor="rgba(255,255,255,0.7)"
+                                    style={styles.SignInInputFields}
+                                    keyboardType="number-pad"
+                                    value={otpCode}
+                                    onChangeText={setOtpCode}
+                                />
+                            </View>
                         </View>
                     </View>
 
-                    {/* Buttons */}
-                    <View style={styles.buttonContainer}>
+                    <View style={styles.buttonSection}>
                         <SignUpButton
-                            title={'Sign In'}
+                            title={'Sign up'}
                             onPress={handleSignUp}
-                            style={{ marginBottom: responsiveHeight(2) }}
                         />
-                        <View style={styles.LoginTextContainer}>
-                            <Text style={styles.LogInText}>Already Have account?
-                                <TouchableOpacity onPress={() => navigation.popTo('SignInScreen')}>
-                                    <Text style={styles.boldTxt}> Log In</Text></TouchableOpacity></Text>
+                        <View style={styles.footerTextContainer}>
+                            <Text style={styles.LogInText}>Already Have account? </Text>
+                            <TouchableOpacity onPress={() => navigation.popTo('SignInScreen')}>
+                                <Text style={styles.boldTxt}>Log In</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </ScrollView>
@@ -239,52 +224,64 @@ const SignUpScreen = ({ navigation, route }) => {
     );
 };
 
-
 export default SignUpScreen;
 
 const styles = StyleSheet.create({
-    container: {
+    outerContainer: {
         flex: 1,
         backgroundColor: '#000',
     },
-
-    googleBtn: {
-        marginBottom: "4%"
-    },
-    facebookBtn: {},
-
-    ArrowStyle: {
-        height: responsiveHeight(2),
-        width: responsiveWidth(3),
-        tintColor: 'white'
-    },
-
-    bgImage: {
+    backgroundContainer: {
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        width: '100%',
-        height: Dimensions.get('screen').height,
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT,
     },
-
-    /* Skip Button */
-    skipButton: {
-        top: responsiveHeight(5),
+    bgImage: {
+        width: '100%',
+        height: '100%',
+    },
+    container: {
+        flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        minHeight: SCREEN_HEIGHT,
+        paddingBottom: responsiveHeight(8),
+    },
+    topSection: {
+        width: '100%',
+        flex: 1,
+    },
+    navButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: responsiveWidth(5),
+        marginTop: responsiveHeight(2),
+    },
+    navButton: {
         flexDirection: "row",
         alignItems: "center",
+        padding: 10,
+    },
+    ArrowStyle: {
+        height: responsiveHeight(2),
+        width: responsiveWidth(4),
+        resizeMode: 'contain',
+        tintColor: 'white'
     },
     skipText: {
         color: "white",
         fontSize: RFValue(14),
         fontWeight: "500",
     },
-
-    /* Input Fields */
     formInputFields: {
-        marginTop: 20,
-        gap: 23,
+        marginTop: responsiveHeight(3),
+        gap: responsiveHeight(2),
     },
     inputWrapper: {
         flexDirection: "row",
@@ -293,7 +290,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         borderBottomWidth: 2,
         borderBottomColor: "white",
-        paddingBottom: responsiveHeight(0.2),
+        paddingBottom: responsiveHeight(0.5),
     },
     inputIcon: {
         width: responsiveWidth(6),
@@ -303,13 +300,13 @@ const styles = StyleSheet.create({
     },
     passwordicon: {
         width: responsiveWidth(7),
-        height: responsiveHeight(3),
+        height: responsiveHeight(2.5),
+        resizeMode: 'contain',
         tintColor: "white",
     },
     EyeIconSpace: {
-        flex: 1,
         height: responsiveHeight(5),
-        paddingHorizontal: '2%',
+        paddingHorizontal: 10,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -320,25 +317,23 @@ const styles = StyleSheet.create({
         fontSize: RFValue(16),
         fontWeight: "400",
     },
-
-    /* Buttons */
-    buttonContainer: {
+    buttonSection: {
         alignItems: "center",
-        marginTop: responsiveHeight(4),
-        // backgroundColor: 'red'
+        marginTop: 'auto',
+        paddingTop: responsiveHeight(5),
     },
-
-    linkText: {
-        color: "white",
-        fontSize: RFValue(19),
+    footerTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: responsiveHeight(2),
     },
-    linkBold: {
-        fontSize: RFValue(19),
-        color: "white",
-        fontWeight: "800",
+    LogInText: {
+        fontSize: RFValue(16),
+        color: 'white',
     },
-    LoginTextContainer: { alignSelf: 'center' },
-    LogInText: { fontSize: RFValue(18), color: 'white' },
-    boldTxt: { fontWeight: 'bold', fontSize: RFValue(18), color: 'white' },
-
+    boldTxt: {
+        fontWeight: 'bold',
+        fontSize: RFValue(16),
+        color: 'white',
+    },
 });

@@ -18,3 +18,15 @@ export const API_ENDPOINTS = {
     VERIFY_OTP: 'verifyOtp',
     GOOGLE_LOGIN: 'google-login',
 };
+
+export const EMPTY_ADDRESS = {
+    id: null,
+    address_type: 'home',
+    address_line_2: '',
+    address_line_1: '',
+    city: '',
+    pincode: '',
+    name: '',
+    phone_no: '',
+    default: 0
+};

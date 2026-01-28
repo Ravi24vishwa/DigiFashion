@@ -19,81 +19,91 @@ import {
 } from "react-native-responsive-dimensions";
 import HeaderTextBlock from "../../components/common/HeaderTextBlock";
 import SignUpButton from '../../components/common/SignUpButton';
+import Toast from "react-native-toast-message";
 
+
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('screen');
 
 const ForgotPassScreen = ({ navigation }) => {
-
-
     const [email, setEmail] = useState("");
     const HandleNewPassword = () => {
         if (!email.trim()) {
-            alert("Please enter email ");
+            // alert("Please enter email ");
+            Toast.show
+            ({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Please enter email'
+            });
             return;
         }
         navigation.navigate('SetNewPassword')
     }
     return (
-        <View style={styles.container}>
-            <ImageBackground
-                source={require("../../assets/images/ForgotPasswordScreen.png")}
-                style={styles.bgImage}
-                resizeMode="cover"
-            />
+        <View style={styles.outerContainer}>
+            {/* Fixed Background Image Layer */}
+            <View style={styles.backgroundContainer} pointerEvents="none">
+                <Image
+                    source={require("../../assets/images/ForgotPasswordScreen.png")}
+                    style={styles.bgImage}
+                    resizeMode="cover"
+                />
+            </View>
             <KeyboardAvoidingView
-                style={{ flex: 1 }}
+                style={styles.container}
                 behavior={Platform.OS === "ios" ? "padding" : undefined}
             >
-
                 <ScrollView
-                    contentContainerStyle={{ flexGrow: 1 }}
+                    contentContainerStyle={styles.scrollContent}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
+                    bounces={false}
                 >
-                    <View style={styles.BackArrowBtnContainer}>
-                        <TouchableOpacity
-                            style={styles.BackButton}
-                            onPress={() => navigation.pop()}
-                        >
-                            <Image
-                                source={require('../../assets/icons/Back.png')}
-                                style={styles.ArrowStyle}
-                            />
-                        </TouchableOpacity>
+                    <View style={styles.topSection}>
+                        <View style={styles.navButtons}>
+                            <TouchableOpacity
+                                style={styles.navButton}
+                                onPress={() => navigation.pop()}
+                            >
+                                <Image
+                                    source={require('../../assets/icons/Back.png')}
+                                    style={styles.ArrowStyle}
+                                />
+                            </TouchableOpacity>
+                        </View>
+
+                        <HeaderTextBlock
+                            title="Digi"
+                            boldPart="FASHION"
+                            subtitle={'Forgot Password'}
+                            containerStyle={{ marginLeft: responsiveWidth(9), marginTop: responsiveHeight(5) }}
+                            subtitleStyle={{ fontSize: RFValue(26), fontWeight: '700' }}
+                        />
+
+                        <View style={styles.formInputFields}>
+                            <View style={styles.descriptionContainer}>
+                                <Text style={styles.descriptionTxt}>If you forget your account password please write{"\n"}your Email Id</Text>
+                            </View>
+                            <View style={styles.inputWrapper}>
+                                <Image
+                                    source={require("../../assets/icons/Email.png")}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    placeholder="Enter Email Id"
+                                    placeholderTextColor="rgba(255,255,255,0.7)"
+                                    style={styles.SignInInputFields}
+                                    keyboardType="email-address"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    autoCapitalize="none"
+                                />
+                            </View>
+                        </View>
                     </View>
 
-                    {/* Header */}
-                    <HeaderTextBlock
-                        title="Digi"
-                        boldPart="FASHION"
-                        subtitle={'Forgot Password'}
-                        containerStyle={{ marginLeft: responsiveWidth(9), marginBottom: responsiveHeight(6) }}
-                        subtitleStyle={{ fontSize: RFValue(26), fontWeight: '700' }}
-                    />
-                    {/* Input Fields */}
-                    <View style={styles.formInputFields}>
-                        <View style={styles.DiscriptionTxt}>
-                            <Text style={{ color: 'white', fontSize: RFValue(16) }}>If you forget your account password please write{"\n"}your Email Id</Text>
-                        </View>
-                        {/* Email Field */}
-                        <View style={styles.inputWrapper}>
-                            <Image
-                                source={require("../../assets/icons/Email.png")}
-                                style={styles.inputIcon}
-                            />
-                            <TextInput
-                                placeholder="Enter Email Id"
-                                placeholderTextColor="rgba(255,255,255,0.7)"
-                                style={styles.SignInInputFields}
-                                keyboardType="email-address"
-                                value={email}
-                                onChangeText={setEmail}
-                            />
-                        </View>
-                    </View>
-
-                    {/* Buttons */}
-                    <View style={styles.buttonContainer}>
-                      <SignUpButton
+                    <View style={styles.buttonSection}>
+                        <SignUpButton
                             title={'Sign Up'}
                             onPress={HandleNewPassword}
                         />
@@ -104,72 +114,78 @@ const ForgotPassScreen = ({ navigation }) => {
     );
 };
 
-
 export default ForgotPassScreen;
 
 const styles = StyleSheet.create({
-    container: {
+    outerContainer: {
         flex: 1,
         backgroundColor: '#000'
     },
-
-    bgImage: {
+    backgroundContainer: {
         position: 'absolute',
         top: 0,
-        bottom: 0,
         left: 0,
         right: 0,
-        height: Dimensions.get('screen').height,
+        bottom: 0,
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT,
     },
-
-    BackArrowBtnContainer: {
-        top: responsiveHeight(5),
-        flexDirection: 'row',
-        marginHorizontal: 20,
-        height: responsiveHeight(2),
+    bgImage: {
+        width: '100%',
+        height: '100%',
     },
-
-    BackButton: {
-        flexDirection: "row",
-        alignItems: "center",
+    container: {
+        flex: 1,
     },
-
+    scrollContent: {
+        flexGrow: 1,
+        minHeight: SCREEN_HEIGHT,
+        paddingBottom: responsiveHeight(8),
+    },
+    topSection: {
+        width: '100%',
+        flex: 1,
+    },
+    navButtons: {
+        paddingHorizontal: responsiveWidth(5),
+        marginTop: responsiveHeight(2),
+    },
+    navButton: {
+        padding: 10,
+    },
     ArrowStyle: {
-        height: 26,
-        width: 26,
+        height: responsiveHeight(2),
+        width: responsiveWidth(4),
+        resizeMode: 'contain',
         tintColor: 'white'
     },
-    /* Input Fields */
     formInputFields: {
-        marginTop: 20,
-        gap: 23,
+        marginTop: responsiveHeight(3),
+        gap: responsiveHeight(2),
+        alignItems: 'center',
     },
-
-    DiscriptionTxt: {
-        flex: 1,
-        justifyContent: 'center',
-        alignSelf: 'center',
+    descriptionContainer: {
         width: responsiveWidth(82),
-        // backgroundColor: 'red'
     },
-
+    descriptionTxt: {
+        color: 'white',
+        fontSize: RFValue(16),
+        textAlign: 'left',
+    },
     inputWrapper: {
         flexDirection: "row",
         alignItems: "center",
         width: responsiveWidth(82),
-        alignSelf: "center",
         borderBottomWidth: 2,
         borderBottomColor: "white",
-        paddingBottom: responsiveHeight(0.2),
+        paddingBottom: responsiveHeight(0.5),
     },
-
     inputIcon: {
         width: responsiveWidth(6),
         height: responsiveWidth(6),
         resizeMode: "contain",
         tintColor: "white",
     },
-
     SignInInputFields: {
         flex: 1,
         paddingLeft: 10,
@@ -177,15 +193,10 @@ const styles = StyleSheet.create({
         fontSize: RFValue(16),
         fontWeight: "400",
     },
-
-    /* Buttons */
-    buttonContainer: {
+    buttonSection: {
         alignItems: "center",
-        marginTop: responsiveHeight(10),
-    },
-
-    SendBtn: {
-        marginBottom: "4%",
+        marginTop: 'auto',
+        paddingTop: responsiveHeight(5),
     },
 });
 
