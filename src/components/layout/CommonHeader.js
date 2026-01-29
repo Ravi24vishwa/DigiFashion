@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { useCart } from '../../hooks/useCart';
 
 export const CommonHeader = ({
     title,
@@ -18,6 +19,16 @@ export const CommonHeader = ({
     cartBadgeCount
 }) => {
     const navigation = useNavigation();
+    const isFocused = useIsFocused();
+    const { refreshCart, cartItems } = useCart();
+
+    useEffect(() => {
+        if (isFocused) {
+            refreshCart();
+        }
+    }, [isFocused, refreshCart]);
+
+    const displayBadgeCount = cartBadgeCount !== undefined ? cartBadgeCount : (cartItems?.length || 0);
 
     const handleBack = () => {
         if (onBackPress) {
@@ -102,9 +113,9 @@ export const CommonHeader = ({
                             source={require('../../assets/icons/Buy1.png')}
                             style={styles.icon}
                         />
-                        {cartBadgeCount > 0 && (
+                        {displayBadgeCount > 0 && (
                             <View style={styles.badge}>
-                                <Text style={styles.badgeText}>{cartBadgeCount}</Text>
+                                <Text style={styles.badgeText}>{displayBadgeCount}</Text>
                             </View>
                         )}
                     </TouchableOpacity>

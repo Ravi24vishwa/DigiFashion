@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../../api/apiService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_ENDPOINTS, STORAGE_KEYS } from '../../constants';
+import { STORAGE_KEYS } from '../../constants';
+import { API_ENDPOINTS } from '../../api/endpoints';
 export const login = createAsyncThunk(
     'auth/login',
     async (credentials, { rejectWithValue }) => {

@@ -276,7 +276,7 @@ export const ReviewsSection = ({ reviews, averageRating, totalReviews }) => {
         <ReviewItem key={index} {...review} />
       ))}
 
-     {reviews===0 ?  <TouchableOpacity
+      {reviews === 0 ? <TouchableOpacity
         activeOpacity={0.9}
         style={styles.loadMoreButton}
         onPress={() => setIsfullReview(!IsfullReview)}
