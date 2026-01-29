@@ -1,6 +1,6 @@
 
 import { GoogleAuthProvider, getAuth, signInWithCredential } from '@react-native-firebase/auth';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import {
     StyleSheet,
     Text,
@@ -16,7 +16,7 @@ import {
     Dimensions
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -35,6 +35,7 @@ const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('screen');
 const EmailVerificationScreen = ({ navigation }) => {
     const dispatch = useDispatch();
     const insets = useSafeAreaInsets();
+    const { isLoading } = useSelector((state) => state.auth);
 
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState('');
@@ -73,40 +74,58 @@ const EmailVerificationScreen = ({ navigation }) => {
         }
     };
 
+
     const onGoogleButtonPress = async () => {
         try {
-            console.log('onGoogleButtonPress --------------###########>')
             setLocalLoading(true);
-            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
 
-            // Sign out first to force account picker to show
-            // This ensures users can manually choose their Google account
+            await GoogleSignin.hasPlayServices({
+                showPlayServicesUpdateDialog: true,
+            });
+
+            // Force account picker
             await GoogleSignin.signOut();
 
             const signInResult = await GoogleSignin.signIn();
-            const idToken = signInResult?.data.idToken;
-            console.log('idToken----+++++++++>', signInResult)
 
-            if (!idToken) throw new Error('No ID token');
+            // 🚨 SAFETY CHECK
+            if (!signInResult?.data?.idToken) {
+                return null;
+            }
 
-            const credential = GoogleAuthProvider.credential(idToken);
-            console.log('idToken ====================>', idToken)
-            console.log('credential  ====================>', credential)
+            const credential = GoogleAuthProvider.credential(
+                signInResult.data.idToken
+            );
+
             return await signInWithCredential(getAuth(), credential);
+
         } catch (err) {
+
+            // ✅ USER CANCELLED → STOP EVERYTHING
+            if (err.code === statusCodes.SIGN_IN_CANCELLED) {
+                console.log('User cancelled Google login');
+                return null;
+            }
+
+            // Other real errors
             Alert.alert('Google Login Error', err.message);
             throw err;
+
         } finally {
             setLocalLoading(false);
         }
     };
 
+
     const handleGoogleLogin = async () => {
         try {
-            console.log('handleGoogleLogin-----------------#####>')
             const res = await onGoogleButtonPress();
-            console.log('response of google ------------>', res)
-            if (!res?.user) return;
+
+            // 🚨 STOP API CALL
+            if (!res?.user) {
+                console.log('No Google user selected → API call skipped');
+                return;
+            }
 
             const payload = {
                 email: res.user.email,
@@ -117,10 +136,16 @@ const EmailVerificationScreen = ({ navigation }) => {
             };
 
             const resultAction = await dispatch(googleLogin(payload));
+
             if (!googleLogin.fulfilled.match(resultAction)) {
-                Alert.alert('Login Error', resultAction.payload?.message || 'Login failed');
+                Alert.alert(
+                    'Login Error',
+                    resultAction.payload?.message || 'Login failed'
+                );
             }
-        } catch { }
+        } catch (e) {
+            console.log('handleGoogleLogin error:', e);
+        }
     };
 
 
@@ -192,11 +217,16 @@ const EmailVerificationScreen = ({ navigation }) => {
                     </View>
                     {/* BUTTON SECTION */}
                     <View style={styles.buttonSection}>
-                        <SignUpButton title="Sign Up" onPress={handleSendOtp} />
+                        <SignUpButton
+                            title="Sign Up"
+                            onPress={handleSendOtp}
+                            loading={isLoading && !localLoading}
+                        />
                         <SignUpButton
                             title="Google Login"
                             onPress={handleGoogleLogin}
                             imageSource={require('../../assets/icons/google.png')}
+                            loading={localLoading || (isLoading && localLoading)}
                             style={{
                                 marginTop: 10,
                             }}

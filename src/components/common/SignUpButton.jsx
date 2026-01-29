@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import React from 'react'
 import { RFValue } from "react-native-responsive-fontsize";
 import { responsiveWidth, responsiveHeight } from "react-native-responsive-dimensions";
 import Toast from "react-native-toast-message";
+
 const SignUpButton = (
     {
         title,
@@ -10,23 +11,31 @@ const SignUpButton = (
         onPress,
         imageSource = null, //require(...) OR { uri:" "}
         imageStyle,
+        loading = false,
+        disabled = false,
     }
 ) => {
     return (
         <View style={[styles.ButtonList, style]}>
-            {/* Sign In Button */}
             <TouchableOpacity
-                style={styles.signInBtn}
+                style={[styles.signInBtn, (disabled || loading) && styles.disabledBtn]}
                 onPress={onPress}
+                disabled={disabled || loading}
             >
-                {imageSource && (
-                    <Image
-                        source={imageSource}
-                        style={[styles.image, imageStyle]}
-                        resizeMode="contain"
-                    />)
-                }
-                <Text style={styles.signInBtnTxt}>{title}</Text>
+                {loading ? (
+                    <ActivityIndicator color="#000" size="small" />
+                ) : (
+                    <>
+                        {imageSource && (
+                            <Image
+                                source={imageSource}
+                                style={[styles.image, imageStyle]}
+                                resizeMode="contain"
+                            />
+                        )}
+                        <Text style={styles.signInBtnTxt}>{title}</Text>
+                    </>
+                )}
             </TouchableOpacity>
         </View>
     )
@@ -49,6 +58,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
         // backgroundColor: 'red'
+    },
+    disabledBtn: {
+        opacity: 0.7,
+        backgroundColor: '#f0f0f0'
     },
     signInBtnTxt: {
         color: '#000',

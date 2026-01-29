@@ -120,9 +120,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingVertical: 16, // More spacious
+        paddingVertical: 10, // More spacious
         backgroundColor: '#fff',
-        marginTop: 20, // Adjust for status bar
+        marginTop: responsiveHeight(4), // Adjust for status bar
         // Shadow for depth
         // shadowColor: '#000',
         // shadowOffset: { width: 0, height: 1 },

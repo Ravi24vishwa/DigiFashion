@@ -78,8 +78,9 @@ const VerifyOTPScreen = ({ navigation, route }) => {
 
           <View style={styles.buttonSection}>
             <SignUpButton
-              title={isLoading ? "Verifying..." : "Verify"}
+              title="Verify"
               onPress={handleVerify}
+              loading={isLoading}
             />
           </View>
         </ScrollView>
