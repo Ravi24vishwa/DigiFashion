@@ -51,12 +51,12 @@ const SignInScreen = ({ navigation }) => {
     const handleSignIn = async () => {
         if (!email.trim() || !password.trim()) {
             // alert("Please enter email and password");
-             Toast.show
-            ({
-                type: 'info',
-                text1: 'Info',
-                text2: 'Please enter email and password'
-            });
+            Toast.show
+                ({
+                    type: 'info',
+                    text1: 'Info',
+                    text2: 'Please enter email and password'
+                });
             return;
         }
 
@@ -76,7 +76,7 @@ const SignInScreen = ({ navigation }) => {
                     resultAction.error?.message ||
                     "Login failed";
                 // alert(errorMessage);
-                 Toast.show
+                Toast.show
                     ({
                         type: 'error',
                         text1: 'Error',
@@ -85,12 +85,12 @@ const SignInScreen = ({ navigation }) => {
                 return;
             }
         } catch (err) {
-             Toast.show
-            ({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Something went wrong. Please try again.'
-            });
+            Toast.show
+                ({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Something went wrong. Please try again.'
+                });
             // alert("Something went wrong. Please try again.");
         }
     };
@@ -123,13 +123,13 @@ const SignInScreen = ({ navigation }) => {
                             title="Digi"
                             boldPart="FASHION"
                             subtitle={'Sign in'}
-                            containerStyle={{ 
-                                marginLeft: responsiveWidth(9), 
-                                marginTop: responsiveHeight(15) 
+                            containerStyle={{
+                                marginLeft: responsiveWidth(9),
+                                marginTop: responsiveHeight(15)
                             }}
-                            subtitleStyle={{ 
-                                fontSize: RFValue(28), 
-                                fontWeight: '700' 
+                            subtitleStyle={{
+                                fontSize: RFValue(28),
+                                fontWeight: '700'
                             }}
                         />
 
@@ -201,6 +201,7 @@ const SignInScreen = ({ navigation }) => {
                         <SignUpButton
                             title={"Sign In"}
                             onPress={handleSignIn}
+                            loading={isLoading}
                         />
                         <View style={styles.footerTextContainer}>
                             <Text style={styles.linkText}>

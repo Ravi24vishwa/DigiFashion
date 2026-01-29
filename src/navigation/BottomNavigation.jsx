@@ -21,12 +21,12 @@ const TabIcon = React.memo(({ focused, activeIcon, inactiveIcon, label, iconStyl
   <View style={styles.tabItem}>
     {focused && <View style={styles.activeIndicator} />}
     <View style={[
-        styles.iconContainer,
-    {
-      backgroundColor: focused ? '#5B6BEE' : 'transparent',
-      width: focused ? 70 : 55,
-      height: focused ? 70 : 55,
-    },
+      styles.iconContainer,
+      {
+        backgroundColor: focused ? '#5B6BEE' : 'transparent',
+        width: focused ? 70 : 55,
+        height: focused ? 70 : 55,
+      },
     ]}>
       <Image
         source={focused ? activeIcon : inactiveIcon}

@@ -210,6 +210,7 @@ const SignUpScreen = ({ navigation, route }) => {
                         <SignUpButton
                             title={'Sign up'}
                             onPress={handleSignUp}
+                            loading={isLoading}
                         />
                         <View style={styles.footerTextContainer}>
                             <Text style={styles.LogInText}>Already Have account? </Text>
