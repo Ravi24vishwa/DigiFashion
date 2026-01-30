@@ -19,6 +19,7 @@ import ProductGrid from '../../components/features/products/ProductGrid';
 import { productService } from '../../api/productService';
 import { ActivityIndicator, Animated as RNAnimated } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { shareContent } from '../../utils/shareUtils';
 
 // Main Screen Component
 export default function ProductDetailScreen({ navigation, route }) {
@@ -140,6 +141,20 @@ export default function ProductDetailScreen({ navigation, route }) {
     }
   }, [saleProduct, toggleFavorite, isFavorite, removeFavoriteLocally]);
 
+  const handleSharePress = useCallback((item) => {
+    const target = item || saleProduct;
+    if (!target) return;
+
+    // Construct a shareable message/URL
+    const shareUrl = `https://digifashion.app/product/${target.id || target.product_id}`;
+
+    shareContent({
+      message: `Check out this amazing product: ${target.title || target.product_name || 'DigiFashion Product'}!`,
+      title: target.title || target.product_name,
+      url: shareUrl
+    });
+  }, [saleProduct]);
+
   useEffect(() => {
     if (
       saleProduct?.product_additional_details?.Size && saleProduct?.product_additional_details?.Color
@@ -236,7 +251,7 @@ export default function ProductDetailScreen({ navigation, route }) {
         // showShare={true}
         onBackPress={() => navigation.goBack()}
         onWishlistPress={() => handleFavoritePress(saleProduct)}
-        // onSharePress={handleSharePress}
+        onSharePress={() => handleSharePress(saleProduct)}
         cartBadgeCount={cart?.cartItems?.length || 0}
       />
       <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
@@ -280,7 +295,7 @@ export default function ProductDetailScreen({ navigation, route }) {
           <ProductInfo
             item={saleProduct}
             onPress={handleFavoritePress}
-          // onShare={handleSharePress}
+            onShare={handleSharePress}
           />
           <View style={styles.divider} />
           <SizeSelector
